@@ -1,0 +1,13 @@
+Famine roadmap
+
+- language
+- infection (type and residence)
+- signature (residence)
+- target
+- anti debugging
+- criteria of infection
+- dependance (section header)
+- obfuscation
+
+- Test main with state machine and different program flow (does opcode look the same ?)
+- When injecting a constructor does the entry point change ?
