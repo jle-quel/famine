@@ -6,11 +6,51 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdbool.h>
+#include <sys/stat.h>
+#include <stdlib.h>
+
+////////////////////////////////////////////////////////////////////////////////
+/// STRUCTURES
+////////////////////////////////////////////////////////////////////////////////
+
+struct linux_dirent64
+{
+	unsigned long d_ino;
+	unsigned long d_off;
+	unsigned short d_reclen;
+	unsigned char d_type;
+	char d_name[];
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 /// DEFINES
 ////////////////////////////////////////////////////////////////////////////////
 
+#define FILE_TYPE 8
+
+#define BUFF_SIZE 1024*1024*5
+
 #define VOID __attribute__((unused))
+
+////////////////////////////////////////////////////////////////////////////////
+/// PROTOTYPES 
+////////////////////////////////////////////////////////////////////////////////
+
+// FAMINE_C
+void famine(const char *dir);
+
+// INFECT_C
+__attribute__((hot)) void infect_file(const char *str);
+
+// INLINE_C
+int _open(const char *pathname, int flags, long mode);
+int _close(int fd);
+int _write(int fd, const void *buf, long count);
+int _getdents64(unsigned int fd, struct linux_dirent64 *dirp, unsigned int count);
+int _stat(const char *pathname, struct stat *statbuf);
+int _getuid(void);
 
 #endif
