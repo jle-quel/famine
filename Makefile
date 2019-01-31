@@ -9,6 +9,7 @@ SRC_NAME = main.c	\
 	   infect.c	\
 	   inline.c	\
 	   utils.c	\
+	   file.c	\
 
 OBJ_NAME = $(SRC_NAME:.c=.o)
 
