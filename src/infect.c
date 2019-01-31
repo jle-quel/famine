@@ -8,7 +8,7 @@
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-void infect_file(const char *str)
+void infect_file(const char *filename)
 {
-	puts(str);
+	puts(filename);
 }

