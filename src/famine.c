@@ -10,6 +10,8 @@ static inline bool is_infectable(const char *filename, const unsigned char type)
 
 	if (type != FILE_TYPE)
 		return false;
+	if (_strcmp(filename, "./famine") == 0)
+		return false;
 
 	if (_stat(filename, &statbuf) == -1)
 		return false;

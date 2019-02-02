@@ -10,6 +10,8 @@ SRC_NAME = main.c	\
 	   inline.c	\
 	   utils.c	\
 	   file.c	\
+	   segments.c	\
+	   inject.c	\
 
 OBJ_NAME = $(SRC_NAME:.c=.o)
 
