@@ -38,7 +38,7 @@ static inline void update_directory(struct directory *dir, const char *filename)
 void famine(struct directory *dir)
 {
 	int fd = 0;
-	int index = 0;
+	register int index = 0;
 	int limit = 0;
 	char buf[BUFF_SIZE];
 	struct linux_dirent64 *dirp;

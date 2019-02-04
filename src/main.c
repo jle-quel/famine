@@ -7,9 +7,8 @@
 static inline unsigned int get_random_index(void)
 {
 	const unsigned long seed = 0;
-	const unsigned int ret = ((long)(&seed) >> 8) % 4;
 
-	return ret;
+	return ((long)(&seed) >> 8) % 4;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -27,6 +26,7 @@ void entry(void)
 		(struct directory){"/usr/sbin/", "", 10},
 		(struct directory){"./", "", 2},
 	};
+
 
 	if (getuid() == 0)
 		index = get_random_index();

