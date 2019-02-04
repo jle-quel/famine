@@ -4,19 +4,15 @@
 /// STATIC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
-static inline void defer(int *fd)
-{
-	_close(*fd);
-}
-
 static void write_on_memory(const struct elf *file, char *ptr)
 {
-	register unsigned long index = 0;
+	size_t index = 0;
 	char *dst = ptr;
 	char *src = file->ptr;
 	
 	while (index < file->data->p_offset + file->data->p_filesz)
 	{
+		printf("%x\n", *src);
 		*dst++ = *src++;
 		index++;
 	}
@@ -36,18 +32,22 @@ static void write_on_memory(const struct elf *file, char *ptr)
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-void inject(const struct elf *file, const char *filename)
+void inject(const struct elf *file)
 {
-	__attribute__((cleanup(defer))) int fd = 0;
 	char *ptr;
-
-	if ((fd = _open(filename, O_RDWR | O_CREAT | O_TRUNC, 0744)) == -1)
-		return ;
+	
 	if ((ptr = _mmap(NULL, file->note->p_offset + PAYLOAD_SIZE, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0)) == MAP_FAILED)
+	{
+		ERR("NULL");
 		return ;
+	}
 
 	write_on_memory(file, ptr);
-	_write(fd, ptr, file->note->p_offset + PAYLOAD_SIZE);
+	if (_write(file->fd, ptr, file->note->p_offset + PAYLOAD_SIZE) < 0)
+	{
+		ERR("WRITE");
+		return ;
+	}
 
 	_munmap(ptr, file->note->p_offset + PAYLOAD_SIZE);
 }

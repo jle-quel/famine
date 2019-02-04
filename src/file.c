@@ -1,34 +1,39 @@
 #include <famine.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-/// STATIC FUNCTIONS
-////////////////////////////////////////////////////////////////////////////////
-
-static inline void defer(int *fd)
-{
-	_close(*fd);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// STATIC FUNCTIONS
+/// PUBLIC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
 struct elf get_file(const char *str)
 {
-	__attribute__((cleanup(defer))) int fd = 0;
 	struct stat statbuf;
 	struct elf ret;
 
 	ret.size = 0;
 
-	if ((fd = _open(str, O_RDONLY, 0000)) == -1)
+	if ((ret.fd = _open(str, O_RDWR, 0000)) < 0)
+	{
+		ERR(str);
 		return ret;
-	if (_stat(str, &statbuf) == -1)
+	}
+	if (_stat(str, &statbuf) < 0)
+	{
+		ERR(str);
 		return ret;
-	if ((ret.ptr = _mmap(NULL, statbuf.st_size, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0)) == MAP_FAILED)
+	}
+	if ((ret.ptr = _mmap(NULL, statbuf.st_size, PROT_READ | PROT_WRITE, MAP_PRIVATE, ret.fd, 0)) == MAP_FAILED)
+	{
+		ERR("NULL");
 		return ret;
+	}
 
 	ret.size = statbuf.st_size;
 
 	return ret;
+}
+
+void release_file(struct elf *file)
+{
+	_close(file->fd);
+	_munmap(file->ptr, file->size);
 }

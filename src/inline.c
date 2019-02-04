@@ -173,24 +173,3 @@ int _munmap(void *addr, unsigned long length)
 
 	return ret;
 }
-
-int _rename(const char *oldpath, const char *newpath)
-{
-	int ret = 0;
-
-	__asm__ volatile (
-			"mov rdi, %0\n"
-			"mov rsi, %1\n"
-			"mov rax, 82\n"
-			"syscall\n"
-			:
-			: "g"(oldpath), "g"(newpath)
-			);
-	__asm__ (
-			"mov %0, eax\n"
-			: "=r"(ret)
-			:
-		);
-
-	return ret;
-}

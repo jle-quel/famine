@@ -29,16 +29,11 @@ static inline bool is_data_segment(const Elf64_Phdr *segment)
 	return segment->p_flags == (PF_W | PF_R);
 }
 
-static inline void modify_struct(struct elf *file, Elf64_Phdr *segment)
+static inline void modify_note_segment(Elf64_Phdr *segment, struct elf *file)
 {
 	file->addr_padding = (file->data->p_vaddr + file->data->p_memsz) % file->data->p_align;
 	file->offs_padding = file->data->p_align - ((file->data->p_offset + file->data->p_filesz) % file->data->p_align);
-	
-	file->note = segment;
-}
 
-static inline void modify_segment(Elf64_Phdr *segment, const struct elf *file)
-{
 	segment->p_filesz = PAYLOAD_SIZE;
 	segment->p_memsz = PAYLOAD_SIZE;
 
@@ -48,8 +43,9 @@ static inline void modify_segment(Elf64_Phdr *segment, const struct elf *file)
 
 	segment->p_vaddr = ((file->data->p_vaddr + file->data->p_memsz) + (file->data->p_align - file->addr_padding));
 	segment->p_offset = ((file->data->p_offset + file->data->p_filesz) + file->offs_padding);
-}
 
+	file->note = segment;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// PUBLIC FUNCTION
@@ -63,21 +59,14 @@ void modify_segments(struct elf *file)
 	for (Elf64_Half index = 0; index < header->e_phnum; index++)
 	{
 		if ((segment = get_segment(file, index)) == NULL)
+		{
+			ERR("CORRUPTION");
 			return ;
+		}
 
 		if (is_data_segment(segment) == true)
 			file->data = segment;
-
 		if (is_note_segment(segment) == true)
-		{
-			modify_struct(file, segment);
-			modify_segment(segment, file);
-
-			printf("segment->offset = %lx\n", segment->p_offset);
-			printf("segment->offset = %lx\n", file->note->p_offset);
-			puts("");
-			printf("segment->addrr = %lx\n", segment->p_vaddr);
-			printf("segment->addrr = %lx\n", file->note->p_vaddr);
-		}
+			modify_note_segment(segment, file);
 	}
 }

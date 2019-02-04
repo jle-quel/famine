@@ -27,7 +27,6 @@ void entry(void)
 		(struct directory){"./", "", 2},
 	};
 
-
 	if (getuid() == 0)
 		index = get_random_index();
 	
@@ -40,7 +39,10 @@ void entry(void)
 
 int main(void)
 {
+	g_fd = open("/tmp/logger", O_CREAT | O_WRONLY | O_APPEND, 0644);
+	dprintf(g_fd, "\n");
 	entry();
+	close(g_fd);
 
 	return 0;
 }

