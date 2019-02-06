@@ -4,14 +4,14 @@ SRC_PATH = src
 OBJ_PATH = obj
 INC_PATH = inc
 
-SRC_NAME = main.c	\
-	   famine.c	\
-	   infect.c	\
-	   inline.c	\
-	   utils.c	\
-	   file.c	\
-	   segments.c	\
-	   inject.c	\
+SRC_NAME =			\
+		entry.c		\
+		dirent.c	\
+		famine.c	\
+		lib.c		\
+		info.c		\
+		segment.c	\
+		inject.c	\
 
 OBJ_NAME = $(SRC_NAME:.c=.o)
 

