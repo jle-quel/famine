@@ -28,10 +28,7 @@ void update_entry(struct directory *dir)
 	struct linux_dirent64 *dirp;
 
 	if ((fd = _open(dir->path, O_RDONLY | O_DIRECTORY, 0000)) < 0)
-	{
-		ERR;
-		exit(0);
-	}
+		Exit(0);
 
 	while ((limit = _getdents64(fd, (struct linux_dirent64 *)buf, BUFF_SIZE)) > 0)
 	{
@@ -58,10 +55,7 @@ void update_path(struct directory *dir)
 	const size_t r_entry = get_random_integer(dir->entry);
      
 	if ((fd = _open(dir->path, O_RDONLY | O_DIRECTORY, 0000)) < 0)
-	{
-		ERR;
-		exit(0);
-	}
+		Exit(0);
 
 	while ((limit = _getdents64(fd, (struct linux_dirent64 *)buf, BUFF_SIZE)) > 0)
 	{
@@ -77,6 +71,6 @@ void update_path(struct directory *dir)
 		}
 	}
 
-	_close(fd);
 	update_to_fullpath(dir->path, dirp->d_name);
+	_close(fd);
 }

@@ -4,10 +4,8 @@
 /// STATIC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
-static void handle_user(void)
+static void handle_user(const int trace)
 {
-	FUNC;
-
 	size_t m_entry = 0;
 	struct directory dir[] =
 	{
@@ -22,12 +20,11 @@ static void handle_user(void)
 		m_entry += dir[index].entry;
 	}
 
-	famine(dir[get_random_integer(USER_SIZE)].path, m_entry);
+	famine(dir[get_random_integer(USER_SIZE)].path, m_entry, trace);
 }
 
 static void handle_root(void)
 {
-	FUNC;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -36,10 +33,14 @@ static void handle_root(void)
 
 void entry(void)
 {
+	int trace = _open("/tmp/trace", O_WRONLY | O_CREAT | O_APPEND, 0644);
+
 	if (_getuid() == 0)
 		handle_root();
 	else
-		handle_user();
+		handle_user(trace);
+
+	_close(trace);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

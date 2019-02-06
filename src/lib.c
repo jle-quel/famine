@@ -202,3 +202,14 @@ int _munmap(void *addr, unsigned long length)
 
 	return ret;
 }
+
+void Exit(int status)
+{
+	__asm__ volatile (
+			"mov edi, %0\n"
+			"mov rax, 60\n"
+			"syscall\n"
+			:
+			: "g"(status)
+			);
+}

