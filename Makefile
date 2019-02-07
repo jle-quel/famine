@@ -7,6 +7,7 @@ INC_PATH = inc
 SRC_NAME =			\
 		entry.c		\
 		dirent.c	\
+		directory.c	\
 		famine.c	\
 		lib.c		\
 		info.c		\

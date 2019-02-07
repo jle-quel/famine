@@ -63,6 +63,7 @@ void famine(const char *file, const size_t m_entry, const int trace)
 		(const struct criteria){&is_linked},
 		(const struct criteria){&is_not_infected},
 	};
+
 	
 	for (unsigned char index = 0; index < CRITERIA_SIZE; index++)
 	{

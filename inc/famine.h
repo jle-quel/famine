@@ -38,6 +38,8 @@
 
 #define CRITERIA_SIZE 4
 
+#define PADDING 8
+
 ////////////////////////////////////////////////////////////////////////////////
 /// STRUCTURES
 ////////////////////////////////////////////////////////////////////////////////
@@ -104,8 +106,9 @@ size_t _strlen(const char *str);
 void _bzero(char *str, const size_t size);
 ssize_t _getrandom(void *buf, size_t buflen, unsigned int flags);
 
-// DIRENT_C
-__attribute__((hot)) void update_entry(struct directory *dir);
-__attribute__((hot)) void update_path(struct directory *dir); 
+// DIRENT
+
+__attribute__((hot)) void update_dirent(char *dirent, const char *path);
+__attribute__((hot)) void update_directory(struct directory *dir, const char *dirent);
 
 #endif
