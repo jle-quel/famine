@@ -52,7 +52,7 @@ void update_path(struct directory *dir)
 	struct linux_dirent64 *dirp;
 
 	size_t entry = 0;
-	const size_t r_entry = get_random_integer(dir->entry);
+	const size_t r_entry = _get_random_integer(dir->entry);
      
 	if ((fd = _open(dir->path, O_RDONLY | O_DIRECTORY, 0000)) < 0)
 		Exit(0);

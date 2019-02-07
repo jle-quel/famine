@@ -20,7 +20,7 @@ static void handle_user(const int trace)
 		m_entry += dir[index].entry;
 	}
 
-	famine(dir[get_random_integer(USER_SIZE)].path, m_entry, trace);
+	famine(dir[_get_random_integer(USER_SIZE)].path, m_entry, trace);
 }
 
 static void handle_root(void)

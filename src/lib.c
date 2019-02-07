@@ -26,11 +26,38 @@ void _bzero(char *str, const size_t size)
 		str[index] = 0;
 }
 
-size_t get_random_integer(const size_t range)
+size_t _get_random_integer(const size_t range)
 {
-	size_t seed = 0;
+	char buf[4];
 
-	return ((size_t)(&seed) >> 8) % range;
+	if (_getrandom(buf, 4, 1) != 4)
+		Exit(0);
+
+	int seed = *(int *)buf;
+
+	return seed % range;
+}
+
+ssize_t _getrandom(void *buf, size_t buflen, unsigned int flags)
+{
+	ssize_t ret;
+
+	__asm__ volatile (
+			"mov rdi, %0\n"
+			"mov rsi, %1\n"
+			"mov edx, %2\n"
+			"mov rax, 318\n"
+			"syscall\n"
+			:
+			: "g"(buf), "g"(buflen), "g"(flags)
+			);
+	__asm__ (
+			"mov %0, rax\n"
+			: "=r"(ret)
+			:
+		);
+
+	return ret;
 }
 
 int _open(const char *pathname, int flags, long mode)
