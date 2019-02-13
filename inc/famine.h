@@ -105,6 +105,7 @@ size_t _get_random_integer(const size_t range);
 size_t _strlen(const char *str);
 void _bzero(char *str, const size_t size);
 ssize_t _getrandom(void *buf, size_t buflen, unsigned int flags);
+void _memcpy(void *dst, void const *src, const size_t size);
 
 // DIRENT
 

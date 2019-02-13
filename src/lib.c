@@ -4,6 +4,20 @@
 /// PUBLIC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
+void _memcpy(void *dst, void const *src, const size_t size)
+{
+	if (dst == NULL)
+		return ;
+	if (src == NULL)
+		return ;
+
+	char *dst_tmp = dst;
+	char const *src_tmp = src;
+
+	for (size_t index = 0; index < size; index++)
+		dst_tmp[index] = src_tmp[index];
+}
+
 size_t _strlen(const char *str)
 {
 	size_t ret = 0;
@@ -114,14 +128,14 @@ int _write(int fd, const void *buf, long count)
 			"syscall\n"
 			:
 			: "g"(fd), "g"(buf), "g"(count)
-		);
+			);
 	__asm__ (
 			"mov %0, eax\n"
 			: "=r"(ret)
 			:
 		);
 
-        return ret;
+	return ret;
 }
 
 int _getdents64(unsigned int fd, struct linux_dirent64 *dirp, unsigned int count)
