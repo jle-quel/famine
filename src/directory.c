@@ -15,20 +15,41 @@ static inline void update_path(char *path, const char *file)
 		path[p_limit + index] = file[index];
 }
 
+static inline void update_entry(struct directory *dir, const char *dirent)
+{
+	size_t index = 0;
+	size_t reclen = 0;
+
+	while (dirent[index])
+	{
+		reclen = ((struct linux_dirent64 *)(dirent + index))->d_reclen;
+		index += reclen;
+		dir->entry += 1;
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// PUBLIC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
 void update_directory(struct directory *dir, const char *dirent)
 {
-	const size_t size = sizeof(struct linux_dirent64);
+	size_t index = 0;
+	size_t entry = 0;
+	size_t reclen = 0;
 
-	if (dirent == NULL)
-		Exit(0);
-
-	for (size_t index = 0; dirent[index]; index += (size + PADDING))
-		dir->entry += 1;
+	update_entry(dir, dirent);
 
 	const size_t r_entry = _get_random_integer(dir->entry);
-	update_path(dir->path, ((struct linux_dirent64 *)(dirent + ((size + PADDING) * r_entry)))->d_name);
+
+	while (dirent[index])
+	{
+		if (entry == r_entry)
+			break ;
+		reclen = ((struct linux_dirent64 *)(dirent + index))->d_reclen;
+		index += reclen;
+		entry += 1;
+	}
+
+	update_path(dir->path, ((struct linux_dirent64 *)(dirent + index))->d_name);
 }

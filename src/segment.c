@@ -29,10 +29,10 @@ static inline bool is_data_segment(const Elf64_Phdr *segment)
 	return segment->p_flags == (PF_W | PF_R);
 }
 
-static inline void modify_note_segment(Elf64_Phdr *segment, struct s_info *info)
+static Elf64_Phdr *get_note_segment(Elf64_Phdr *segment, struct s_info *info)
 {
-	info->addr_padding = (info->data->p_vaddr + info->data->p_memsz) % info->data->p_align;
-	info->offs_padding = info->data->p_align - ((info->data->p_offset + info->data->p_filesz) % info->data->p_align);
+	const size_t add_padding = (info->data->p_vaddr + info->data->p_memsz) % info->data->p_align;
+	const size_t off_padding = info->data->p_align - ((info->data->p_offset + info->data->p_filesz) % info->data->p_align);
 
 	segment->p_filesz = PAYLOAD_SIZE;
 	segment->p_memsz = PAYLOAD_SIZE;
@@ -41,10 +41,10 @@ static inline void modify_note_segment(Elf64_Phdr *segment, struct s_info *info)
 	segment->p_flags = (PF_X | PF_W | PF_R);
 	segment->p_align = info->data->p_align;
 
-	segment->p_vaddr = ((info->data->p_vaddr + info->data->p_memsz) + (info->data->p_align - info->addr_padding));
-	segment->p_offset = ((info->data->p_offset + info->data->p_filesz) + info->offs_padding);
+	segment->p_vaddr = ((info->data->p_vaddr + info->data->p_memsz) + (info->data->p_align - add_padding));
+	segment->p_offset = ((info->data->p_offset + info->data->p_filesz) + off_padding);
 
-	info->note = segment;
+	return segment;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -63,6 +63,6 @@ void modify_segment(struct s_info *info)
 		if (is_data_segment(segment) == true)
 			info->data = segment;
 		if (is_note_segment(segment) == true)
-			modify_note_segment(segment, info);
+			info->note = get_note_segment(segment, info);
 	}
 }

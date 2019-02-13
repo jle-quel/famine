@@ -36,8 +36,7 @@ void update_dirent(char *dirent, const char *path)
 	char buf[BUFF_SIZE];
 	size_t d_index = 0;
 	size_t b_index = 0;
-	int reclen = 0;
-	const size_t size = sizeof(struct linux_dirent64);
+	size_t reclen = 0;
 
 	_bzero(buf, BUFF_SIZE);
 	_bzero(dirent, BUFF_SIZE);
@@ -50,12 +49,11 @@ void update_dirent(char *dirent, const char *path)
 
 		if (((struct linux_dirent64 *)(buf + b_index))->d_name[0] != '.')
 		{
-			for (size_t index = 0; index < size; index++)
+			for (size_t index = 0; index < reclen; index++)
 			{
 				dirent[d_index] = buf[b_index + index];
 				d_index += 1;
 			}
-			d_index += PADDING;
 		}
 		b_index += reclen;
 	}
