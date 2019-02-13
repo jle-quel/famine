@@ -80,6 +80,7 @@ struct criteria
 ////////////////////////////////////////////////////////////////////////////////
 
 // FAMINE
+void constructor(void);
 __attribute__((hot)) void famine(const char *file, const size_t m_entry, const int trace);
 void modify_segment(struct s_info *info);
 void inject(const struct s_info *info, const size_t m_entry, const int trace);

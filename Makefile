@@ -17,7 +17,7 @@ SRC_NAME =			\
 OBJ_NAME = $(SRC_NAME:.c=.o)
 
 CC = gcc 
-CFLAGS = -Wall -Wextra -Werror -g3 -fsanitize=address -masm=intel
+CFLAGS = -Wall -Wextra -Werror -masm=intel
 
 RED=\033[1;31m
 GREEN=\033[1;32m
