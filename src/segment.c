@@ -31,8 +31,14 @@ static inline bool is_data_segment(const Elf64_Phdr *segment)
 
 static Elf64_Phdr *get_note_segment(Elf64_Phdr *segment, struct s_info *info)
 {
-	const size_t add_padding = (info->data->p_vaddr + info->data->p_memsz) % info->data->p_align;
-	const size_t off_padding = info->data->p_align - ((info->data->p_offset + info->data->p_filesz) % info->data->p_align);
+	const size_t base = info->data->p_vaddr + info->data->p_memsz;
+	const size_t add_padding = base % info->data->p_align;
+
+	segment->p_vaddr = base + (info->data->p_align - add_padding);
+	segment->p_offset = base - add_padding;
+
+	printf("%lx\n", segment->p_vaddr); 
+	printf("%lx\n", segment->p_offset);
 
 	segment->p_filesz = PAYLOAD_SIZE;
 	segment->p_memsz = PAYLOAD_SIZE;
@@ -40,9 +46,6 @@ static Elf64_Phdr *get_note_segment(Elf64_Phdr *segment, struct s_info *info)
 	segment->p_type = PT_LOAD;
 	segment->p_flags = (PF_X | PF_W | PF_R);
 	segment->p_align = info->data->p_align;
-
-	segment->p_vaddr = ((info->data->p_vaddr + info->data->p_memsz) + (info->data->p_align - add_padding));
-	segment->p_offset = ((info->data->p_offset + info->data->p_filesz) + off_padding);
 
 	return segment;
 }
