@@ -4,13 +4,6 @@
 /// STATIC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
-const char payload[] =
-{
-	0xe8, 0x06, 0x00, 0x00, 0x00, 0x48, 0x65, 0x6c, 0x6c, 0x6f,
-	0x0a, 0xbf, 0x01, 0x00, 0x00, 0x00, 0x5e, 0xba, 0x06, 0x00,
-	0x00, 0x00, 0xb8, 0x01, 0x00, 0x00, 0x00, 0x0f, 0x05,
-};
-
 static void write_on_memory(const struct s_info *info, char *ptr)
 {
 	size_t index = 0;
@@ -29,24 +22,19 @@ static void write_on_memory(const struct s_info *info, char *ptr)
 	}
 	while (index < info->note->p_offset + PAYLOAD_SIZE)
 	{
-		*dst++ = 0;
+		*dst++ = 42;
 		index++;
 	}
-
-	_memcpy(ptr + info->note->p_offset, payload, sizeof(payload));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-void inject(const struct s_info *info, const size_t m_entry, const int trace)
+void inject(const struct s_info *info, __attribute__((unused))const size_t m_entry, const int trace)
 {
 	char *ptr;
-	(void)m_entry;
 
-	printf("%lu\n", sizeof(payload));
-	
 	if ((ptr = _mmap(NULL, info->note->p_offset + PAYLOAD_SIZE, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0)) == MAP_FAILED)
 		Exit(0);
 

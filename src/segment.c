@@ -37,9 +37,6 @@ static Elf64_Phdr *get_note_segment(Elf64_Phdr *segment, struct s_info *info)
 	segment->p_vaddr = base + (info->data->p_align - add_padding);
 	segment->p_offset = base - add_padding;
 
-	printf("%lx\n", segment->p_vaddr); 
-	printf("%lx\n", segment->p_offset);
-
 	segment->p_filesz = PAYLOAD_SIZE;
 	segment->p_memsz = PAYLOAD_SIZE;
 
