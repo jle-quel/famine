@@ -14,6 +14,9 @@ static inline void launch(struct directory *dir, const size_t size, const int tr
 		update_dirent(dirent, dir[index].path);
 		update_directory(&dir[index], dirent);
 		m_entry += dir[index].entry;
+
+		if (dir[index].entry == 0)
+			Exit(0);
 	}
 
 	famine(dir[_get_random_integer(size)].path, m_entry, trace);
