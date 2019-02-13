@@ -13,7 +13,7 @@ int main(void)
 /// STATIC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
-static inline void launch(struct directory *dir, const size_t size, const int trace)
+static void launch(struct directory *dir, const size_t size, const int trace)
 {
 	size_t m_entry = 0;
 	char dirent[BUFF_SIZE];
