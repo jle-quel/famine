@@ -8,16 +8,18 @@ SRC_NAME =			\
 		entry.c		\
 		dirent.c	\
 		directory.c	\
-		famine.c	\
 		lib.c		\
+		famine.c	\
 		info.c		\
 		segment.c	\
+		header.c	\
 		inject.c	\
+		_test.c		\
 
 OBJ_NAME = $(SRC_NAME:.c=.o)
 
 CC = gcc 
-CFLAGS = -Wall -Wextra -Werror -masm=intel
+CFLAGS = -Wall -Wextra -Werror -masm=intel -D DEBUG
 
 RED=\033[1;31m
 GREEN=\033[1;32m

@@ -4,7 +4,7 @@
 /// STATIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-void update_buf(char *buf, const char *path)
+static void update_buf(char *buf, const char *path)
 {
 	int fd = 0;
 	int index = 0;
@@ -24,19 +24,18 @@ void update_buf(char *buf, const char *path)
 	}
      
 	_close(fd);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// PUBLIC FUNCTIONS
+/// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
 void update_dirent(char *dirent, const char *path)
 {
 	char buf[BUFF_SIZE];
-	size_t d_index = 0;
-	size_t b_index = 0;
-	size_t reclen = 0;
+	unsigned long d_index = 0;
+	unsigned long b_index = 0;
+	unsigned long reclen = 0;
 
 	_bzero(buf, BUFF_SIZE);
 	_bzero(dirent, BUFF_SIZE);
@@ -49,7 +48,7 @@ void update_dirent(char *dirent, const char *path)
 
 		if (((struct linux_dirent64 *)(buf + b_index))->d_name[0] != '.')
 		{
-			for (size_t index = 0; index < reclen; index++)
+			for (unsigned long index = 0; index < reclen; index++)
 			{
 				dirent[d_index] = buf[b_index + index];
 				d_index += 1;

