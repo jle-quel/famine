@@ -59,10 +59,8 @@ void constructor(void)
 			);
 
 	__asm__ volatile (
-			"jmp L1\n"
-			);
-	__asm__ volatile (
-			"L1:\n"
+			"add rsp, 8\n"
+			"jmp Exit\n"
 			);
 }
 
@@ -87,7 +85,8 @@ static void launch(struct directory *dir, const unsigned long size, const int tr
 
 static void entry(void)
 {
-	int trace = _open("/tmp/trace", O_WRONLY | O_CREAT | O_APPEND, 0644);
+	char fd[] = "/tmp/trace";
+	int trace = _open(fd, O_WRONLY | O_CREAT | O_APPEND, 0644);
 
 	struct directory user[] =
 	{

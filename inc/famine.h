@@ -23,7 +23,7 @@
 #define ELF_MAGIC_NUMBER 1179403647
 #define X86_64 2
 
-#define PAYLOAD_SIZE 105
+#define PAYLOAD_SIZE 5020
 
 #define BUFF_SIZE 1024 * 1024
 
