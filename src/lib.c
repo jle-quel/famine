@@ -4,9 +4,9 @@
 /// STATIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-static unsigned long _getrandom(void *buf, unsigned long buflen, unsigned int flags)
+static size_t _getrandom(void *buf, size_t buflen, unsigned int flags)
 {
-	unsigned long ret;
+	size_t ret;
 
 	__asm__ volatile (
 			"mov rdi, %0\n"
@@ -31,7 +31,7 @@ static unsigned long _getrandom(void *buf, unsigned long buflen, unsigned int fl
 /// PUBLIC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
-void _memcpy(void *dst, void const *src, const unsigned long size)
+void _memcpy(void *dst, void const *src, const size_t size)
 {
 	if (dst == NULL)
 		return ;
@@ -41,13 +41,13 @@ void _memcpy(void *dst, void const *src, const unsigned long size)
 	char *dst_tmp = dst;
 	char const *src_tmp = src;
 
-	for (unsigned long index = 0; index < size; index++)
+	for (size_t index = 0; index < size; index++)
 		dst_tmp[index] = src_tmp[index];
 }
 
-unsigned long _strlen(const char *str)
+size_t _strlen(const char *str)
 {
-	unsigned long ret = 0;
+	size_t ret = 0;
 
 	if (str == NULL)
 		return 0;
@@ -58,18 +58,20 @@ unsigned long _strlen(const char *str)
 	return ret;
 }
 
-void _bzero(char *str, const unsigned long size)
+void _bzero(char *str, const size_t size)
 {
 	if (str == NULL)
 		return ;
 
-	for (unsigned long index = 0; index < size; index++)
+	for (size_t index = 0; index < size; index++)
 		str[index] = 0;
 }
 
-unsigned long _get_random_integer(const unsigned long range)
+size_t _get_random_integer(const size_t range)
 {
 	char buf[4];
+
+	_bzero(buf, 4);
 
 	if (_getrandom(buf, 4, 1) != 4)
 		Exit(0);
@@ -203,7 +205,7 @@ int _getuid(void)
 	return ret;
 }
 
-void *_mmap(void *addr, unsigned long length,  unsigned long prot, unsigned long flags, unsigned long fd, unsigned long offset)
+void *_mmap(void *addr, size_t length,  size_t prot, size_t flags, size_t fd, size_t offset)
 {
 	void *ret;
 
@@ -228,7 +230,7 @@ void *_mmap(void *addr, unsigned long length,  unsigned long prot, unsigned long
 	return ret;
 }
 
-int _munmap(void *addr, unsigned long length)
+int _munmap(void *addr, size_t length)
 {
 	int ret = 0;
 

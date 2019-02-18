@@ -6,33 +6,33 @@
 
 static inline Elf64_Phdr *get_segment(const struct s_info *info, Elf64_Half index)
 {
-	Elf64_Phdr *ret;
+	Elf64_Phdr *segment;
 
-	ret = (Elf64_Phdr *)((void *)info->ptr + sizeof(Elf64_Ehdr) + (sizeof(Elf64_Phdr) * index));
+	segment = (Elf64_Phdr *)((void *)info->ptr + sizeof(Elf64_Ehdr) + (sizeof(Elf64_Phdr) * index));
 
-	if ((void *)ret >= info->ptr + info->size)
-		Exit(0);
+	if ((void *)segment >= info->ptr + info->size)
+		segment = NULL;
 
-	return ret;
+	return segment;
 }
 
-static inline char is_note_segment(const Elf64_Phdr *segment)
+static inline bool is_note_segment(const Elf64_Phdr *segment)
 {
 	return segment->p_type == PT_NOTE;
 }
 
-static inline char is_data_segment(const Elf64_Phdr *segment)
+static inline bool is_data_segment(const Elf64_Phdr *segment)
 {
 	if (segment->p_type != PT_LOAD)
-		return FALSE;
+		return false;
 
 	return segment->p_flags == (PF_W | PF_R);
 }
 
 static Elf64_Phdr *get_note_segment(Elf64_Phdr *segment, struct s_info *info)
 {
-	const unsigned long base = info->data->p_vaddr + info->data->p_memsz;
-	const unsigned long add_padding = base % info->data->p_align;
+	const size_t base = info->data->p_vaddr + info->data->p_memsz;
+	const size_t add_padding = base % info->data->p_align;
 
 	segment->p_vaddr = base + (info->data->p_align - add_padding);
 	segment->p_offset = base - add_padding;
@@ -58,11 +58,12 @@ void modify_segment(struct s_info *info)
 
 	for (Elf64_Half index = 0; index < header->e_phnum; index++)
 	{
-		segment = get_segment(info, index);
+		if ((segment = get_segment(info, index)) == NULL)
+			return ;
 
-		if (is_data_segment(segment) == TRUE)
+		if (is_data_segment(segment) == true)
 			info->data = segment;
-		if (is_note_segment(segment) == TRUE)
+		if (is_note_segment(segment) == true)
 			info->note = get_note_segment(segment, info);
 	}
 }

