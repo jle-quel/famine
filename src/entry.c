@@ -69,13 +69,11 @@ void constructor(void)
 
 static void launch(struct directory *dir, const size_t size)
 {
-	char dirent[BUFF_SIZE];
-
 	for (uint8_t index = 0; index < size; index++)
 	{
-		if (update_dirent(dirent, dir[index].path) == FAILURE)
+		if (update_entry(dir) == FAILURE)
 			return ;
-		if (update_directory(&dir[index], dirent) == FAILURE)
+		if (update_path(dir) == FAILURE)
 			return ;
 	}
 

@@ -77,8 +77,9 @@ size_t _get_random_integer(const size_t range)
 		Exit(0);
 
 	int seed = *(int *)buf;
+	int ret = seed % range;
 
-	return seed % range;
+	return ret;
 }
 
 int _open(const char *pathname, int flags, long mode)

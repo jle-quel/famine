@@ -80,7 +80,6 @@ void inject(struct s_info *info)
 	_write(info->fd, ptr, info->note->p_offset + PAYLOAD_SIZE);
 	_munmap(ptr, info->note->p_offset + PAYLOAD_SIZE);
 	release_info(info);
-
 #if DEBUG
 	char name[] = "/tmp/trace";
 	int fd = _open(name, O_RDWR | O_CREAT | O_APPEND, 0644);
