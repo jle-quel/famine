@@ -262,3 +262,65 @@ void Exit(int status)
 			);
 }
 
+pid_t _fork(void)
+{
+	pid_t ret = 0;
+
+	__asm__ volatile (
+			"mov rax, 57\n"
+			"syscall\n"
+			);
+	__asm__ (
+			"mov %0, eax\n"
+			: "=r"(ret)
+			:
+		);
+
+	return ret;
+}
+
+int _execve(const char *filename, char *const argv[], char *const envp[])
+{
+	int ret = 0;
+
+	__asm__ volatile (
+			"mov rdi, %0\n"
+			"mov rsi, %1\n"
+			"mov rdx, %2\n"
+			"mov rax, 59\n"
+			"syscall\n"
+			:
+			: "g"(filename), "g"(argv), "g"(envp)
+			);
+	__asm__ (
+			"mov %0, eax\n"
+			: "=r"(ret)
+			:
+		);
+
+	return ret;
+
+}
+
+pid_t _wait4(pid_t pid, int *wstatus, int options, struct rusage *rusage)
+{
+	int ret = 0;
+
+	__asm__ volatile (
+			"mov edi, %0\n"
+			"mov rsi, %1\n"
+			"mov edx, %2\n"
+			"mov r10, %3\n"
+			"mov rax, 61\n"
+			"syscall\n"
+			:
+			: "g"(pid), "g"(wstatus), "g"(options), "g"(rusage)
+			);
+	__asm__ (
+			"mov %0, eax\n"
+			: "=r"(ret)
+			:
+		);
+
+	return ret;
+}

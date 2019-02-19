@@ -4,7 +4,7 @@
 /// PUBLIC FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
-struct s_info get_info(const char *file)
+struct s_info get_info(char *file)
 {
 	struct s_info info;
 	struct stat statbuf;
@@ -19,12 +19,16 @@ struct s_info get_info(const char *file)
 	if ((info.fd = _open(file, O_RDWR, 0644)) < 0)
 	{
 #if DEBUG
-		char fam[] = "\033[0;31mFamine\033[0m: ";
+		char name[] = "/tmp/trace";
+		int fd = _open(name, O_RDWR | O_CREAT | O_APPEND, 0644);
+		char fam[] = "Famine: ";
 		char des[] = " can't open itself\n\n";
 
-		_write(1, fam, _strlen(fam)); 
-		_write(1, info.name, _strlen(info.name));
-		_write(1, des, _strlen(des)); 
+		_write(fd, fam, _strlen(fam)); 
+		_write(fd, file, _strlen(file));
+		_write(fd, des, _strlen(des)); 
+
+		_close(fd);
 #endif
 		return info;
 	}

