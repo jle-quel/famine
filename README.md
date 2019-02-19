@@ -17,13 +17,13 @@ Must be run on a Linux distribution
 
 ```
 make
-././famine
+./famine
 ```
 
 ## Description
 
-This project is part of the System/Unix cursus at 42.
+This project is part of the Virology cursus at 42.
 
 ## Author
 
-	Jefferson Le Quellec 🐜
+Jefferson Le Quellec 🐜
