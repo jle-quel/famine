@@ -32,7 +32,7 @@
 #define JMP_OFFSET 66
 #define JMP_OPCODE 0xe9
 
-#define PAYLOAD_SIZE 5387
+#define PAYLOAD_SIZE 5403
 
 #define BUFF_SIZE 8192
 
