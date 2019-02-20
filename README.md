@@ -1,6 +1,6 @@
 # Famine 
 
-## Description
+## Introduction
 
 This project is part of the Virology cursus at 42.
 
