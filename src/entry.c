@@ -71,9 +71,9 @@ static void launch(struct directory *dir, const size_t size)
 {
 	for (uint8_t index = 0; index < size; index++)
 	{
-		if (update_entry(dir) == FAILURE)
+		if (update_entry(&(dir[index])) == FAILURE)
 			return ;
-		if (update_path(dir) == FAILURE)
+		if (update_path(&(dir[index])) == FAILURE)
 			return ;
 	}
 
@@ -99,6 +99,7 @@ static void entry(void)
 		struct directory user[] =
 		{
 			(struct directory){"/tmp/test/", 0},
+			(struct directory){"/tmp/test2/", 0},
 		};
 
 		launch(user, sizeof(user) / sizeof(user[0]));
