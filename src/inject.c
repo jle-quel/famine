@@ -56,11 +56,8 @@ static void fuck_you(const struct s_info *info)
 		_close(STDERR_FILENO);
 
 		_execve(av[0], av, NULL);
-
 		Exit(42);
 	}
-	else
-		_wait4(child, NULL, WSTOPPED, NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
