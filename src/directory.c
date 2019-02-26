@@ -22,16 +22,18 @@ static inline void update_to_absolute_path(char *path, const char *file)
 int8_t update_entry(struct directory *dir)
 {
 	int fd = 0;
-	size_t index = 0;
 	size_t limit = 0;
+
 	struct linux_dirent64 *dirp;
 	char buf[BUFF_SIZE];
+	size_t index;
 
 	if ((fd = _open(dir->path, O_RDONLY | O_DIRECTORY, 0000)) < 0)
 		return FAILURE;
 
 	while ((limit = _getdents64(fd, (struct linux_dirent64 *)buf, BUFF_SIZE)) > 0)
 	{
+		index = 0;
 		while (index < limit)
 		{
 			dirp = (struct linux_dirent64 *)(buf + index);
@@ -49,10 +51,11 @@ int8_t update_path(struct directory *dir)
 {
 	int fd = 0;
 	size_t index = 0;
-	size_t limit = 0;
-	size_t r_entry = 0;
-	struct linux_dirent64 *dirp = NULL;
+
+	struct linux_dirent64 *dirp;
 	char buf[BUFF_SIZE];
+	size_t limit;
+	size_t r_entry;
 
 	if ((fd = _open(dir->path, O_RDONLY | O_DIRECTORY, 0000)) < 0)
 		return FAILURE;
@@ -61,6 +64,7 @@ int8_t update_path(struct directory *dir)
 
 	while ((limit = _getdents64(fd, (struct linux_dirent64 *)buf, BUFF_SIZE)) > 0)
 	{
+		index = 0;
 		while (index < limit)
 		{
 			dirp = (struct linux_dirent64 *)(buf + index);
@@ -71,6 +75,8 @@ int8_t update_path(struct directory *dir)
 			index += dirp->d_reclen;
 			r_entry -= 1;
 		}
+		if (r_entry == 0)
+			break ;
 	}
 
 	_close(fd);
