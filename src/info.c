@@ -22,7 +22,7 @@ struct s_info get_info(char *file)
 	{
 #if DEBUG
 		char name[] = "/tmp/trace";
-		int fd = _open(name, O_RDWR | O_CREAT | O_APPEND, 0644);
+		int fd = _open(name, O_RDWR | O_CREAT | O_APPEND, 0666);
 		char fam[] = "Famine: ";
 		char des[] = " can't open itself\n\n";
 

