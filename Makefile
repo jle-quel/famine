@@ -14,6 +14,7 @@ SRC_NAME =			\
 		segment.c	\
 		header.c	\
 		inject.c	\
+		exit.c
 
 OBJ_NAME = $(SRC_NAME:.c=.o)
 

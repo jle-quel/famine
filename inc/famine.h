@@ -32,7 +32,7 @@
 #define JMP_OFFSET 66
 #define JMP_OPCODE 0xe9
 
-#define PAYLOAD_SIZE 5611
+#define PAYLOAD_SIZE (size_t)(&__exit - &__entry)
 
 #define BUFF_SIZE 8192
 
@@ -87,7 +87,9 @@ struct criteria
 ////////////////////////////////////////////////////////////////////////////////
 
 // FAMINE
-void constructor(void);
+void __entry(void);
+void __exit(void);
+
 __attribute__((hot)) void famine(char *file);
 void modify_segment(struct s_info *info);
 void modify_header(struct s_info *info, Elf64_Ehdr *header);

