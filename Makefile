@@ -49,7 +49,7 @@ clean:
 fclean: clean
 	@rm -rf $(NAME)
 	@echo "$(RED)[-]$(NC) Program clear"
-	@ rm $(TRACE_PATH)
+	@rm -f $(TRACE_PATH)
 
 re: fclean
 	@make
