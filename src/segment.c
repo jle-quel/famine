@@ -35,6 +35,7 @@ static inline void update_note_segment(struct s_info *info)
 	const size_t add_padding = base % info->data->p_align;
 
 	info->note->p_vaddr = base + (info->data->p_align - add_padding);
+	info->note->p_paddr = info->note->p_vaddr;
 	info->note->p_offset = base - add_padding;
 
 	info->note->p_filesz = PAYLOAD_SIZE;

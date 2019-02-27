@@ -90,22 +90,23 @@ struct criteria
 void __entry(void);
 void __exit(void);
 
-__attribute__((hot)) void famine(char *file);
-char modify_segment(struct s_info *info);
-void modify_header(struct s_info *info, Elf64_Ehdr *header);
-void inject(struct s_info *info);
+// CORE
+void init(void);
+void famine(char *file);
+__attribute__((hot)) char modify_segment(struct s_info *info);
+__attribute__((hot)) void modify_header(struct s_info *info, Elf64_Ehdr *header);
+__attribute__((hot)) void inject(struct s_info *info);
 
 // DIRENT
 
 __attribute__((hot)) int8_t update_entry(struct directory *dir);
 __attribute__((hot)) int8_t update_path(struct directory *dir);
 
-
 // INFO
 struct s_info get_info(char *file);
 void release_info(struct s_info *info);
 
-// LIB
+// UTILS 
 pid_t _fork(void);
 int _execve(const char *filename, char *const argv[], char *const envp[]);
 pid_t _wait4(pid_t pid, int *wstatus, int options, struct rusage *rusage);
@@ -121,6 +122,6 @@ size_t _get_random_integer(const size_t range);
 size_t _strlen(const char *str);
 void _bzero(char *str, const size_t size);
 void _memcpy(void *dst, void const *src, const size_t size);
-void Exit(int status);
+void _fatal(int status);
 
 #endif

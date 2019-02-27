@@ -74,7 +74,7 @@ size_t _get_random_integer(const size_t range)
 	_bzero(buf, 4);
 
 	if (_getrandom(buf, 4, 1) != 4)
-		Exit(0);
+		_fatal(0);
 
 	int seed = *(int *)buf;
 	int ret = seed % range;
@@ -252,7 +252,7 @@ int _munmap(void *addr, size_t length)
 	return ret;
 }
 
-void Exit(int status)
+void _fatal(int status)
 {
 	__asm__ volatile (
 			"mov edi, %0\n"

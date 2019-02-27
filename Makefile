@@ -7,8 +7,8 @@ TRACE_PATH=/tmp/trace
 
 SRC_NAME =			\
 		entry.c		\
-		directory.c	\
-		lib.c		\
+		dirent.c	\
+		utils.c		\
 		famine.c	\
 		info.c		\
 		segment.c	\

