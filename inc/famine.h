@@ -91,7 +91,7 @@ void __entry(void);
 void __exit(void);
 
 __attribute__((hot)) void famine(char *file);
-void modify_segment(struct s_info *info);
+char modify_segment(struct s_info *info);
 void modify_header(struct s_info *info, Elf64_Ehdr *header);
 void inject(struct s_info *info);
 

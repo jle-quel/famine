@@ -83,8 +83,7 @@ void famine(char *file)
 		}
 	}
 
-	modify_segment(&info);
-	if (info.note == NULL)
+	if (modify_segment(&info) == FAILURE)
 	{
 		release_info(&info);
 		return ;

